@@ -6,6 +6,93 @@
     <title>生產排程管理系統</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script>
+        // Supabase 設定
+        const SUPABASE_URL = 'https://rbtkdhmpaiufirvkexwn.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJidGtkaG1wYWl1ZmlydmtleHduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NTIxOTQsImV4cCI6MjA5MDQyODE5NH0.T-M79J0-gNoKZF2XLoGuFDHn41VDL46XMyDk99ucZmw';
+        
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // 全域資料
+        let projects = [];
+        let customers = [];
+        let vendors = [];
+        
+        // 從 Supabase 載入資料
+        async function loadData() {
+            try {
+                // 載入客戶資料
+                const { data: customersData, error: customersError } = await supabase
+                    .from('customers')
+                    .select('*');
+                if (!customersError) customers = customersData || [];
+                
+                // 載入廠商資料
+                const { data: vendorsData, error: vendorsError } = await supabase
+                    .from('vendors')
+                    .select('*');
+                if (!vendorsError) vendors = vendorsData || [];
+                
+                // 載入專案資料（包含關聯資料）
+                const { data: projectsData, error: projectsError } = await supabase
+                    .from('orders')
+                    .select(`
+                        *,
+                        customers(name, contact_person),
+                        vendors(name),
+                        products(name, specification)
+                    `)
+                    .order('created_at', { ascending: false });
+                
+                if (projectsError) throw projectsError;
+                
+                // 轉換資料格式
+                projects = (projectsData || []).map(order => ({
+                    id: order.order_no,
+                    name: order.products?.name || '未命名產品',
+                    client: order.customers?.name || '未知客戶',
+                    contact: order.customers?.contact_person || '',
+                    status: mapStatus(order.customer_status),
+                    statusText: order.customer_status,
+                    progress: order.customer_progress || 0,
+                    startDate: order.created_at ? order.created_at.split('T')[0] : '',
+                    totalQuantity: order.quantity || 0,
+                    deliveryDate: order.deadline || '',
+                    vendorName: order.vendors?.name || '',
+                    vendorStatus: order.vendor_status || '',
+                    vendorProgress: order.vendor_progress || 0,
+                    notes: order.notes || '',
+                    orders: []
+                }));
+                
+                renderProjects();
+                
+            } catch (error) {
+                console.error('載入資料失敗:', error);
+                document.getElementById('projectsGrid').innerHTML = 
+                    '<div style="text-align:center;padding:60px;color:#c53030;">載入資料失敗: ' + error.message + '</div>';
+            }
+        }
+        
+        // 狀態對應
+        function mapStatus(status) {
+            const map = {
+                '待確認': 'proposal',
+                '已確認': 'quote',
+                '生產中': 'production',
+                '待出貨': 'shipping',
+                '已出貨': 'shipping',
+                '已完成': 'done'
+            };
+            return map[status] || 'proposal';
+        }
+        
+        // 頁面載入時初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+        });
+    </script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -35,7 +122,6 @@
             min-height: 100vh;
         }
 
-        /* Header */
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 20px 24px;
@@ -110,20 +196,6 @@
             transform: translateY(-2px);
         }
 
-        /* Stats Bar - Hidden */
-        .stats-bar {
-            display: none !important;
-        }
-
-        .stat-badge {
-            display: none !important;
-        }
-
-        .update-time {
-            display: none !important;
-        }
-
-        /* Search Bar */
         .search-bar {
             display: flex;
             align-items: center;
@@ -178,75 +250,12 @@
             cursor: pointer;
         }
 
-        /* Main Container */
         .container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 24px;
         }
 
-        /* Phase Tabs */
-        .phase-tabs {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
-
-        .phase-tab {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 20px;
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .phase-tab:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .phase-tab.active {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
-        }
-
-        .phase-tab i {
-            font-size: 16px;
-        }
-
-        .phase-divider {
-            width: 1px;
-            height: 24px;
-            background: var(--border);
-            margin: 0 8px;
-        }
-
-        /* Section Title */
-        .section-title {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: var(--text);
-        }
-
-        .section-title i {
-            color: var(--warning);
-        }
-
-        /* Project Cards Grid */
         .projects-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
@@ -312,22 +321,6 @@
             font-family: monospace;
         }
 
-        .project-status {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            background: #fef3c7;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #92400e;
-        }
-
-        .project-status i {
-            font-size: 10px;
-        }
-
         .project-name {
             font-size: 18px;
             font-weight: 700;
@@ -382,18 +375,6 @@
             color: var(--text);
         }
 
-        .project-meta {
-            display: none;
-        }
-
-        .meta-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
         .progress-bar {
             height: 6px;
             background: var(--border);
@@ -413,500 +394,11 @@
             text-align: right;
             font-size: 12px;
             color: var(--text-secondary);
-            margin-bottom: 16px;
-        }
-
-        .card-actions {
-            display: flex;
-            gap: 12px;
-        }
-
-        .btn-card {
-            flex: 1;
-            padding: 10px 16px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-card.success {
-            background: var(--success);
-            color: white;
-        }
-
-        .btn-card.success:hover {
-            background: #16a34a;
-        }
-
-        .btn-card.warning {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .btn-card.warning:hover {
-            background: #fde68a;
-        }
-
-        /* Main View */
-        #mainView {
-            display: block;
-        }
-
-        /* Project Detail View (Hidden by default) */
-        .detail-view {
-            display: none;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
-
-        .detail-view.active {
-            display: block;
-        }
-
-        .detail-header {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .detail-title {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .btn-back {
-            padding: 10px 20px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-back:hover {
-            background: var(--border);
-        }
-
-        /* Tabs in Detail View */
-        .detail-tabs {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            padding: 0 24px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .detail-tab {
-            padding: 16px 24px;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s;
-        }
-
-        .detail-tab:hover {
-            color: var(--primary);
-        }
-
-        .detail-tab.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-        }
-
-        /* Toolbar */
-        .detail-toolbar {
-            display: flex;
-            align-items: center;
-            padding: 12px 24px;
-            gap: 8px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .toolbar-btn {
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            cursor: pointer;
-            color: var(--text-secondary);
-            background: transparent;
-            border: none;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-
-        .toolbar-btn:hover {
-            background: var(--bg);
-            color: var(--text);
-        }
-
-        .toolbar-divider {
-            width: 1px;
-            height: 24px;
-            background: var(--border);
-            margin: 0 4px;
-        }
-
-        /* Table */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-
-        .data-table th {
-            text-align: left;
-            padding: 14px 16px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            border-bottom: 1px solid var(--border);
-            background: white;
-            white-space: nowrap;
-        }
-
-        .data-table th i {
-            margin-right: 6px;
-        }
-
-        .data-table td {
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--border);
-            vertical-align: middle;
-        }
-
-        .data-table tr:hover td {
-            background: #f8fafc;
-        }
-
-        /* Status Badges */
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .status-done {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .status-progress {
-            background: #dbeafe;
-            color: #1e40af;
-        }
-
-        .status-pending {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .status-hold {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        /* Priority */
-        .priority {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 700;
-        }
-
-        .priority-high {
-            background: #fee2e2;
-            color: #dc2626;
-        }
-
-        .priority-medium {
-            background: #fef3c7;
-            color: #d97706;
-        }
-
-        .priority-low {
-            background: #dcfce7;
-            color: #16a34a;
-        }
-
-        /* Avatar */
-        .avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 700;
-            color: white;
-        }
-
-        .avatar.blue { background: #3b82f6; }
-        .avatar.green { background: #22c55e; }
-        .avatar.purple { background: #8b5cf6; }
-        .avatar.orange { background: #f97316; }
-
-        .user-cell {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Action Button */
-        .btn-action {
-            padding: 8px 16px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-action:hover {
-            background: var(--primary-dark);
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-        }
-
-        .modal-content {
-            position: relative;
-            background: white;
-            border-radius: 16px;
-            width: 90%;
-            max-width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-
-        .modal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .modal-header h3 {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text);
-        }
-
-        .modal-header h3 i {
-            color: var(--primary);
-        }
-
-        .modal-close {
-            width: 32px;
-            height: 32px;
-            border: none;
-            background: #f1f5f9;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 20px;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-close:hover {
-            background: #e2e8f0;
-        }
-
-        .modal-body {
-            padding: 24px;
-        }
-
-        .modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-            padding: 16px 24px;
-            border-top: 1px solid var(--border);
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
-
-        .form-group label {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        .form-group label .required {
-            color: var(--danger);
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            padding: 10px 14px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 14px;
-            background: white;
-            transition: all 0.2s;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-light);
-        }
-
-        .form-group input[readonly] {
-            background: #f8fafc;
-            color: var(--text-secondary);
-        }
-
-        .btn-cancel {
-            padding: 10px 20px;
-            border: 1px solid var(--border);
-            background: white;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-cancel:hover {
-            background: #f8fafc;
-        }
-
-        .btn-save {
-            padding: 10px 24px;
-            border: none;
-            background: var(--primary);
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            color: white;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-save:hover {
-            background: var(--primary-dark);
-        }
-
-        /* Add Row */
-        .add-row {
-        .add-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 16px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .add-row:hover {
-            background: #f8fafc;
-            color: var(--primary);
-        }
-
-        /* Checkbox */
-        .checkbox {
-            width: 18px;
-            height: 18px;
-            border: 2px solid var(--border);
-            border-radius: 4px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-
-        .checkbox:hover {
-            border-color: var(--primary);
-        }
-
-        .checkbox.checked {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
         }
     </style>
 </head>
 <body>
-    <!-- Main View (Project List) -->
     <div id="mainView">
-        <!-- Header -->
         <header class="header">
             <div class="header-top">
                 <div class="logo">
@@ -926,8 +418,6 @@
                     </button>
                 </div>
             </div>
-
-
 
             <div class="search-bar">
                 <div class="search-input">
@@ -953,133 +443,14 @@
             </div>
         </header>
 
-        <!-- Main Content -->
         <div class="container">
-
-
-
-
-            <!-- Project Cards -->
             <div class="projects-grid" id="projectsGrid">
-                <!-- Cards will be generated by JS -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Detail View (Hidden by default) -->
-    <div class="detail-view" id="detailView">
-        <div class="detail-header">
-            <div class="detail-title">
-                <button class="btn-back" onclick="backToMain()">
-                    <i class="fas fa-arrow-left"></i>
-                    返回專案列表
-                </button>
-                <h2 id="detailProjectName">專案詳情</h2>
-            </div>
-        </div>
-
-        <div class="detail-tabs">
-            <div class="detail-tab active">工單列表</div>
-            <div class="detail-tab">生產排程</div>
-            <div class="detail-tab">看板</div>
-            <div class="detail-tab">資源管理</div>
-            <div class="detail-tab">報表分析</div>
-        </div>
-
-        <div class="detail-toolbar">
-            <button class="toolbar-btn" title="新增"><i class="fas fa-plus"></i></button>
-            <button class="toolbar-btn" title="編輯"><i class="fas fa-edit"></i></button>
-            <button class="toolbar-btn" title="刪除"><i class="fas fa-trash"></i></button>
-            <div class="toolbar-divider"></div>
-            <button class="toolbar-btn" title="篩選"><i class="fas fa-filter"></i></button>
-            <button class="toolbar-btn" title="排序"><i class="fas fa-sort"></i></button>
-            <div class="toolbar-divider"></div>
-            <button class="toolbar-btn" title="匯入"><i class="fas fa-file-import"></i></button>
-            <button class="toolbar-btn" title="匯出"><i class="fas fa-file-export"></i></button>
-        </div>
-
-        <div style="overflow-x: auto;">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th style="width: 40px;"><div class="checkbox"></div></th>
-                        <th><i class="fas fa-hashtag"></i>項次</th>
-                        <th><i class="fas fa-flag"></i>階段狀態</th>
-                        <th><i class="fas fa-user"></i>負責人</th>
-                        <th><i class="fas fa-building"></i>廠商</th>
-                        <th><i class="fas fa-chart-line"></i>提案進度</th>
-                        <th><i class="fas fa-calendar-alt"></i>工作日曆天數</th>
-                        <th><i class="fas fa-calendar"></i>起始日期</th>
-                        <th><i class="fas fa-calendar-check"></i>結束日期</th>
-                        <th><i class="fas fa-truck"></i>運送天數</th>
-                        <th><i class="fas fa-calendar-day"></i>結束日期</th>
-                        <th><i class="fas fa-sticky-note"></i>備註</th>
-                    </tr>
-                </thead>
-                <tbody id="detailTableBody">
-                    <!-- Data will be inserted by JS -->
-                </tbody>
-            </table>
-            <div class="add-row">
-                <i class="fas fa-plus"></i>
-                新增工單
+                <div style="text-align:center;padding:60px;color:#666;">載入中...</div>
             </div>
         </div>
     </div>
 
     <script>
-        // Sample Projects Data
-        const projects = [
-            {
-                id: 'A0010-260317',
-                name: '20寸/28寸行李箱+logo印刷',
-                client: '高柏科技',
-                contact: 'Joanne',
-                status: 'proposal',
-                statusText: '提案中',
-                progress: 0,
-                startDate: '2024-03-15',
-                totalQuantity: 7000,
-                deliveryDate: '2024-04-15',
-                orders: [
-                    { id: '1', orderNo: 'WO-202403-001', productName: '20寸行李箱外殼', line: 'A線', status: 'pending', priority: 'high', startDate: '2024-03-20', endDate: '2024-03-24', quantity: 2000, assignee: '張明遠' },
-                    { id: '2', orderNo: 'WO-202403-002', productName: '28寸行李箱外殼', line: 'B線', status: 'pending', priority: 'high', startDate: '2024-03-25', endDate: '2024-03-28', quantity: 1500, assignee: '李思涵' },
-                    { id: '3', orderNo: 'WO-202403-003', productName: 'Logo印刷-熱轉印', line: 'C線', status: 'pending', priority: 'medium', startDate: '2024-03-26', endDate: '2024-03-29', quantity: 3500, assignee: '王建國' }
-                ]
-            },
-            {
-                id: 'A0011-260318',
-                name: '鋁合金手機支架',
-                client: '創新科技',
-                contact: 'Alex',
-                status: 'quote',
-                statusText: '報價中',
-                progress: 25,
-                startDate: '2024-03-18',
-                totalQuantity: 5000,
-                deliveryDate: '2024-04-10',
-                orders: [
-                    { id: '4', orderNo: 'WO-202403-004', productName: '支架底座', line: 'A線', status: 'progress', priority: 'high', startDate: '2024-03-27', endDate: '2024-03-30', quantity: 5000, assignee: '陳雅芳' }
-                ]
-            },
-            {
-                id: 'A0012-260319',
-                name: 'USB-C 充電線組',
-                client: '數位生活',
-                contact: '小美',
-                status: 'sample',
-                statusText: '打樣後',
-                progress: 60,
-                startDate: '2024-03-20',
-                totalQuantity: 20000,
-                deliveryDate: '2024-04-20',
-                orders: [
-                    { id: '5', orderNo: 'WO-202403-005', productName: 'Type-C 線材', line: 'D線', status: 'progress', priority: 'high', startDate: '2024-03-25', endDate: '2024-03-28', quantity: 10000, assignee: '林志豪' },
-                    { id: '6', orderNo: 'WO-202403-006', productName: '包裝盒印刷', line: 'B線', status: 'pending', priority: 'low', startDate: '2024-03-28', endDate: '2024-04-01', quantity: 10000, assignee: '黃美玲' }
-                ]
-            }
-        ];
-
         // Helper function to get day of week
         function getDayOfWeek(dateStr) {
             const days = ['日', '一', '二', '三', '四', '五', '六'];
@@ -1090,8 +461,12 @@
         // Render Project Cards
         function renderProjects() {
             const grid = document.getElementById('projectsGrid');
+            if (!projects || projects.length === 0) {
+                grid.innerHTML = '<div style="text-align:center;padding:60px;color:#666;">暫無資料</div>';
+                return;
+            }
             grid.innerHTML = projects.map(project => {
-                const deliveryDay = getDayOfWeek(project.deliveryDate);
+                const deliveryDay = project.deliveryDate ? getDayOfWeek(project.deliveryDate) : '-';
                 return `
                 <div class="project-card" onclick="openProject('${project.id}')">
                     <div class="card-header">
@@ -1108,265 +483,36 @@
                     <div class="project-info">
                         <div class="info-row">
                             <span class="info-label"><i class="fas fa-calendar"></i> 開始日期</span>
-                            <span class="info-value">${project.startDate}</span>
+                            <span class="info-value">${project.startDate || '-'}</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label"><i class="fas fa-sort-numeric-up"></i> 數量</span>
-                            <span class="info-value">${project.totalQuantity.toLocaleString()}</span>
+                            <span class="info-value">${(project.totalQuantity || 0).toLocaleString()}</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label"><i class="fas fa-calendar-check"></i> 交期</span>
-                            <span class="info-value">${project.deliveryDate} (${deliveryDay})</span>
+                            <span class="info-value">${project.deliveryDate || '-'} (${deliveryDay})</span>
                         </div>
                     </div>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${project.progress}%"></div>
+                        <div class="progress-fill" style="width: ${project.progress || 0}%"></div>
                     </div>
-                    <div class="progress-text">${project.progress}% 完成</div>
+                    <div class="progress-text">${project.progress || 0}% 完成</div>
                 </div>
             `}).join('');
         }
 
-        // Edit Project - Open Modal
-        function editProject(projectId) {
-            const project = projects.find(p => p.id === projectId);
-            if (!project) return;
-            
-            // Create modal if not exists
-            let modal = document.getElementById('editModal');
-            if (!modal) {
-                modal = document.createElement('div');
-                modal.id = 'editModal';
-                modal.className = 'modal';
-                modal.innerHTML = `
-                    <div class="modal-overlay" onclick="closeEditModal()"></div>
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h3><i class="fas fa-edit"></i> 編輯專案</h3>
-                            <button class="modal-close" onclick="closeEditModal()">&times;</button>
-                        </div>
-                        <div class="modal-body">
-                            <form id="editForm">
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label>專案編號 <span class="required">*</span></label>
-                                        <input type="text" id="editProjectId" readonly>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>新增日期 <span class="required">*</span></label>
-                                        <input type="date" id="editCreateDate">
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label>負責人 <span class="required">*</span></label>
-                                        <input type="text" id="editContact" placeholder="輸入負責人姓名...">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>公司名稱 <span class="required">*</span></label>
-                                        <input type="text" id="editClient" placeholder="輸入公司名稱...">
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label>產品名稱</label>
-                                        <input type="text" id="editProductName" placeholder="選填">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>數量</label>
-                                        <input type="number" id="editQuantity" placeholder="選填，例如：1000">
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label>開始日期</label>
-                                        <input type="date" id="editStartDate">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>交期</label>
-                                        <input type="date" id="editDeliveryDate">
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label>目前階段 <span class="required">*</span></label>
-                                        <select id="editStatus">
-                                            <option value="proposal">💡 提案</option>
-                                            <option value="quote">📋 報價</option>
-                                            <option value="sample">🔧 打樣</option>
-                                            <option value="production">🏭 生產</option>
-                                            <option value="shipping">🚚 出貨</option>
-                                            <option value="done">✅ 已完成</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>進度 (%)</label>
-                                        <input type="number" id="editProgress" min="0" max="100" placeholder="0-100">
-                                    </div>
-                                </div>
-                                <div class="form-group full-width">
-                                    <label>備註</label>
-                                    <textarea id="editNotes" rows="3" placeholder="其他備註說明..."></textarea>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button class="btn-cancel" onclick="closeEditModal()">取消</button>
-                            <button class="btn-save" onclick="saveProjectEdit()">儲存</button>
-                        </div>
-                    </div>
-                `;
-                document.body.appendChild(modal);
-            }
-            
-            // Populate form
-            document.getElementById('editProjectId').value = project.id;
-            document.getElementById('editCreateDate').value = project.startDate || '';
-            document.getElementById('editContact').value = project.contact || '';
-            document.getElementById('editClient').value = project.client || '';
-            document.getElementById('editProductName').value = project.name || '';
-            document.getElementById('editQuantity').value = project.totalQuantity || '';
-            document.getElementById('editStartDate').value = project.startDate || '';
-            document.getElementById('editDeliveryDate').value = project.deliveryDate || '';
-            document.getElementById('editStatus').value = project.status || 'proposal';
-            document.getElementById('editProgress').value = project.progress || 0;
-            document.getElementById('editNotes').value = project.notes || '';
-            
-            // Show modal
-            modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
+        function openProject(id) {
+            alert('查看專案: ' + id);
         }
 
-        // Close Edit Modal
-        function closeEditModal() {
-            const modal = document.getElementById('editModal');
-            if (modal) {
-                modal.style.display = 'none';
-                document.body.style.overflow = '';
-            }
-        }
-
-        // Save Project Edit
-        function saveProjectEdit() {
-            const projectId = document.getElementById('editProjectId').value;
-            const project = projects.find(p => p.id === projectId);
-            if (!project) return;
-            
-            project.contact = document.getElementById('editContact').value;
-            project.client = document.getElementById('editClient').value;
-            project.name = document.getElementById('editProductName').value;
-            project.totalQuantity = parseInt(document.getElementById('editQuantity').value) || 0;
-            project.startDate = document.getElementById('editStartDate').value;
-            project.deliveryDate = document.getElementById('editDeliveryDate').value;
-            project.status = document.getElementById('editStatus').value;
-            project.progress = parseInt(document.getElementById('editProgress').value) || 0;
-            project.notes = document.getElementById('editNotes').value;
-            
-            // Update status text
-            const statusMap = {
-                proposal: '提案中',
-                quote: '報價中',
-                sample: '打樣後',
-                production: '生產中',
-                shipping: '出貨中',
-                done: '已完成'
-            };
-            project.statusText = statusMap[project.status] || '提案中';
-            
-            closeEditModal();
-            renderProjects();
-        } = newDeliveryDate;
-            }
-
-            renderProjects();
-        }
-
-        // Open Project Detail
-        function openProject(projectId) {
-            const project = projects.find(p => p.id === projectId);
-            if (!project) return;
-
-            document.getElementById('detailProjectName').textContent = project.name;
-            
-            // Render detail table
-            const tbody = document.getElementById('detailTableBody');
-            tbody.innerHTML = project.orders.map((order, index) => {
-                const statusClass = {
-                    done: 'status-done',
-                    progress: 'status-progress',
-                    pending: 'status-pending',
-                    hold: 'status-hold'
-                }[order.status] || 'status-pending';
-
-                const statusText = {
-                    done: '✓ 已完成',
-                    progress: '● 進行中',
-                    pending: '○ 待產',
-                    hold: '◐ 暫停'
-                }[order.status] || '待產';
-
-                const priorityClass = {
-                    high: 'priority-high',
-                    medium: 'priority-medium',
-                    low: 'priority-low'
-                }[order.priority] || 'priority-medium';
-
-                const priorityText = { high: '高', medium: '中', low: '低' }[order.priority] || '中';
-
-                const colors = ['blue', 'green', 'purple', 'orange'];
-                const avatarColor = colors[index % colors.length];
-
-                return `
-                    <tr>
-                        <td><div class="checkbox"></div></td>
-                        <td>${index + 1}</td>
-                        <td>${order.orderNo}</td>
-                        <td>${order.productName}</td>
-                        <td>${order.line}</td>
-                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                        <td><span class="priority ${priorityClass}">${priorityText}</span></td>
-                        <td>${order.startDate}</td>
-                        <td>${order.endDate}</td>
-                        <td>${order.quantity.toLocaleString()}</td>
-                        <td>
-                            <div class="user-cell">
-                                <div class="avatar ${avatarColor}">${order.assignee.charAt(0)}</div>
-                                <span>${order.assignee}</span>
-                            </div>
-                        </td>
-                        <td><button class="btn-action">編輯</button></td>
-                    </tr>
-                `;
-            }).join('');
-
-            // Switch views
-            document.getElementById('mainView').style.display = 'none';
-            document.getElementById('detailView').classList.add('active');
-        }
-
-        // Back to Main
-        function backToMain() {
-            document.getElementById('mainView').style.display = 'block';
-            document.getElementById('detailView').classList.remove('active');
-        }
-
-        // Project Actions
-        function completeProject(id) {
-            alert(`專案 ${id} 標記為完成結案`);
-        }
-
-        function incompleteProject(id) {
-            alert(`專案 ${id} 標記為未完成結案`);
+        function editProject(id) {
+            alert('編輯專案: ' + id);
         }
 
         function openNewProjectModal() {
             alert('新增專案功能');
         }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            renderProjects();
-        });
     </script>
 </body>
-</html>/* Version: 1774858718 */
+</html>
