@@ -110,40 +110,9 @@
             transform: translateY(-2px);
         }
 
-        /* Stats Bar */
+        /* Stats Bar - Hidden */
         .stats-bar {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .stat-badge {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: rgba(255,255,255,0.15);
-            border-radius: 20px;
-            color: white;
-            font-size: 13px;
-            font-weight: 500;
-        }
-
-        .stat-badge i {
-            font-size: 10px;
-        }
-
-        .stat-badge.urgent i { color: #fecaca; }
-        .stat-badge.processing i { color: #fde68a; }
-        .stat-badge.quote i { color: #bfdbfe; }
-        .stat-badge.sample i { color: #fed7aa; }
-        .stat-badge.done i { color: #bbf7d0; }
-
-        .update-time {
-            margin-left: auto;
-            color: rgba(255,255,255,0.8);
-            font-size: 12px;
+            display: none;
         }
 
         /* Search Bar */
@@ -723,29 +692,7 @@
                 </div>
             </div>
 
-            <div class="stats-bar">
-                <div class="stat-badge urgent">
-                    <i class="fas fa-circle"></i>
-                    緊急: 0
-                </div>
-                <div class="stat-badge processing">
-                    <i class="fas fa-circle"></i>
-                    報價中: 3
-                </div>
-                <div class="stat-badge quote">
-                    <i class="fas fa-circle"></i>
-                    報價待確認: 2
-                </div>
-                <div class="stat-badge sample">
-                    <i class="fas fa-circle"></i>
-                    打樣後: 9
-                </div>
-                <div class="stat-badge done">
-                    <i class="fas fa-circle"></i>
-                    已完成: 1
-                </div>
-                <div class="update-time">更新: 2026/3/30 下午2:36</div>
-            </div>
+
 
             <div class="search-bar">
                 <div class="search-input">
