@@ -79,16 +79,33 @@
         .badge-blue { background: #dbeafe; color: #1e40af; }
         .badge-gray { background: #f3f4f6; color: #4b5563; }
         
-        /* 優先級 */
-        .priority { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; font-size: 12px; font-weight: 700; }
-        .priority-high { background: #fee2e2; color: #dc2626; }
-        .priority-medium { background: #fef3c7; color: #d97706; }
-        .priority-low { background: #d1fae5; color: #059669; }
+        /* Modal Styles */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: white; border-radius: 16px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--border); }
+        .modal-title { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .modal-title i { color: var(--warning); }
+        .btn-close { width: 32px; height: 32px; border: none; background: #f1f5f9; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); }
+        .btn-close:hover { background: var(--danger); color: white; }
+        .modal-body { padding: 24px; }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+        .form-input { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; transition: all 0.2s; }
+        .form-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .modal-footer { display: flex; gap: 12px; padding: 20px 24px; border-top: 1px solid var(--border); }
+        .btn-cancel { flex: 1; padding: 12px 24px; border: 1px solid var(--border); background: white; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .btn-cancel:hover { background: var(--bg); }
+        .btn-save { flex: 1; padding: 12px 24px; border: none; background: var(--primary); border-radius: 10px; font-size: 14px; font-weight: 600; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-save:hover { background: var(--primary-dark); }
+        .btn-save:disabled { background: #ccc; cursor: not-allowed; }
         
         /* Status message */
-        .status-msg { position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; z-index: 2000; }
+        .status-msg { position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; z-index: 2000; animation: slideIn 0.3s ease; }
         .status-msg.success { background: #22c55e; color: white; }
         .status-msg.error { background: #ef4444; color: white; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     </style>
 </head>
 <body>
@@ -152,9 +169,58 @@
                         </tr>
                     </thead>
                     <tbody id="workorderTableBody">
-                        <!-- 工單資料會動態載入 -->
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 編輯專案 Modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-pencil-alt"></i>
+                    編輯專案
+                </div>
+                <button class="btn-close" onclick="closeEditModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editProjectId">
+                
+                <div class="form-group">
+                    <label class="form-label">案名</label>
+                    <input type="text" class="form-input" id="editName" placeholder="輸入案名">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">聯絡人</label>
+                    <input type="text" class="form-input" id="editContact" placeholder="輸入聯絡人姓名">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">開始日期</label>
+                        <input type="date" class="form-input" id="editStartDate">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">交期</label>
+                        <input type="date" class="form-input" id="editDeliveryDate">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">數量</label>
+                    <input type="number" class="form-input" id="editQuantity" placeholder="輸入數量">
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeEditModal()">取消</button>
+                <button class="btn-save" id="saveProjectBtn" onclick="saveProjectEdit()">
+                    <i class="fas fa-check"></i>
+                    更新
+                </button>
             </div>
         </div>
     </div>
@@ -168,7 +234,7 @@
         let projects = [];
         let currentProject = null;
 
-        // 測試工單資料 - 符合新欄位順序
+        // 測試工單資料
         let workorders = [
             { id: 1, stageStatus: '提案中', owner: '李明達', vendor: '高柏科技', progress: 30, workDays: 5, startDate: '2024-03-20', endDate: '2024-03-24', shippingDays: 2, notes: '需確認Logo設計' },
             { id: 2, stageStatus: '報價中', owner: '李思涵', vendor: '創新科技', progress: 50, workDays: 4, startDate: '2024-03-25', endDate: '2024-03-28', shippingDays: 1, notes: '待客戶確認' },
@@ -291,6 +357,72 @@
             `}).join('');
         }
 
+        // 開啟編輯 Modal
+        function openEditModal(id) {
+            const project = projects.find(p => p.id === id);
+            if (!project) return;
+            
+            document.getElementById('editProjectId').value = id;
+            document.getElementById('editName').value = project.name;
+            document.getElementById('editContact').value = project.contact;
+            document.getElementById('editStartDate').value = project.startDate;
+            document.getElementById('editDeliveryDate').value = project.deliveryDate;
+            document.getElementById('editQuantity').value = project.totalQuantity;
+            
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        // 關閉編輯 Modal
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+
+        // 儲存專案編輯
+        async function saveProjectEdit() {
+            const id = document.getElementById('editProjectId').value;
+            const project = projects.find(p => p.id === id);
+            if (!project) return;
+            
+            const saveBtn = document.getElementById('saveProjectBtn');
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 儲存中...';
+            
+            try {
+                // 更新本地資料
+                project.name = document.getElementById('editName').value;
+                project.contact = document.getElementById('editContact').value;
+                project.startDate = document.getElementById('editStartDate').value;
+                project.deliveryDate = document.getElementById('editDeliveryDate').value;
+                project.totalQuantity = parseInt(document.getElementById('editQuantity').value) || 0;
+                
+                // 如果有 Supabase，同步更新
+                if (supabaseClient && project.orderId) {
+                    const { error } = await supabaseClient
+                        .from('orders')
+                        .update({
+                            quantity: project.totalQuantity,
+                            deadline: project.deliveryDate,
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('id', project.orderId);
+                    
+                    if (error) throw error;
+                }
+                
+                renderProjects();
+                closeEditModal();
+                updateLastModifiedTime();
+                showStatus('資料已儲存', 'success');
+                
+            } catch (error) {
+                console.error('儲存失敗:', error);
+                showStatus('儲存失敗: ' + error.message, 'error');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="fas fa-check"></i> 更新';
+            }
+        }
+
         // 點擊專案卡片 - 進入工單列表
         function viewProject(id) {
             currentProject = projects.find(p => p.id === id);
@@ -312,7 +444,7 @@
             currentProject = null;
         }
 
-        // 渲染工單表格 - 新欄位順序
+        // 渲染工單表格
         function renderWorkorders() {
             const tbody = document.getElementById('workorderTableBody');
             
@@ -353,12 +485,6 @@
             alert('新增工單功能開發中...');
         }
 
-        // 開啟編輯視窗
-        function openEditModal(id) {
-            event.stopPropagation();
-            alert('編輯專案功能');
-        }
-
         // 更新最後更新時間
         function updateLastModifiedTime() {
             const now = new Date();
@@ -375,6 +501,11 @@
                 timeEl.textContent = '最後更新: ' + timeStr;
             }
         }
+
+        // 點擊 modal 外部關閉
+        document.getElementById('editModal').addEventListener('click', function(e) {
+            if (e.target === this) closeEditModal();
+        });
 
         // 頁面載入時初始化
         document.addEventListener('DOMContentLoaded', function() {
