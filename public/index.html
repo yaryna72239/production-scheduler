@@ -3,715 +3,496 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SCADA 生產排程控制系統</title>
+    <title>CRM 生產排程管理系統</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
-            --bg-dark: #1a1a2e;
-            --bg-panel: #16213e;
-            --bg-card: #0f3460;
-            --bg-input: #1e293b;
-            --border: #334155;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --accent-blue: #3b82f6;
-            --accent-cyan: #06b6d4;
-            --accent-green: #10b981;
-            --accent-yellow: #f59e0b;
-            --accent-red: #ef4444;
-            --accent-purple: #8b5cf6;
-            --success: #22c55e;
-            --warning: #f97316;
-            --danger: #dc2626;
-            --sidebar-width: 280px;
-            --header-height: 64px;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-hover: #f1f3f4;
+            --border: #e0e0e0;
+            --border-light: #f0f0f0;
+            --text-primary: #202124;
+            --text-secondary: #5f6368;
+            --text-muted: #9aa0a6;
+            --blue: #1a73e8;
+            --blue-light: #e8f0fe;
+            --green: #34a853;
+            --green-light: #e6f4ea;
+            --yellow: #fbbc04;
+            --yellow-light: #fef3e8;
+            --orange: #f9ab00;
+            --orange-light: #fff3e0;
+            --red: #ea4335;
+            --red-light: #fce8e6;
+            --purple: #9c27b0;
+            --purple-light: #f3e5f5;
+            --cyan: #00bcd4;
+            --cyan-light: #e0f7fa;
         }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-dark);
+            background: var(--bg-primary);
             color: var(--text-primary);
-            font-size: 13px;
+            font-size: 14px;
             line-height: 1.5;
+            height: 100vh;
             overflow: hidden;
         }
 
-        /* Layout */
-        .app-container {
+        /* App Container */
+        .app {
             display: flex;
+            flex-direction: column;
             height: 100vh;
         }
 
-        /* Sidebar */
-        .sidebar {
-            width: var(--sidebar-width);
-            background: var(--bg-panel);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .sidebar-header {
-            height: var(--header-height);
+        /* Top Navigation */
+        .top-nav {
             display: flex;
             align-items: center;
-            padding: 0 20px;
+            padding: 8px 16px;
+            background: var(--bg-primary);
             border-bottom: 1px solid var(--border);
-            background: linear-gradient(90deg, var(--bg-panel) 0%, var(--bg-card) 100%);
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-cyan) 100%);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
-        }
-
-        .logo-text {
-            font-size: 18px;
-            font-weight: 700;
-            background: linear-gradient(90deg, var(--text-primary) 0%, var(--accent-cyan) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .logo-sub {
-            font-size: 10px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .sidebar-nav {
-            flex: 1;
-            padding: 16px 12px;
-            overflow-y: auto;
-        }
-
-        .nav-section {
-            margin-bottom: 20px;
-        }
-
-        .nav-section-title {
-            padding: 8px 12px;
-            font-size: 10px;
-            font-weight: 700;
-            color: var(--accent-cyan);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            display: flex;
-            align-items: center;
             gap: 8px;
         }
 
-        .nav-section-title::before {
-            content: '';
-            width: 3px;
-            height: 12px;
-            background: var(--accent-cyan);
-            border-radius: 2px;
-        }
-
-        .nav-item {
+        .nav-tabs {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            margin: 4px 0;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.3s;
-            border-radius: 8px;
-            border-left: 3px solid transparent;
+            gap: 4px;
+            flex: 1;
         }
 
-        .nav-item:hover {
-            background: rgba(59, 130, 246, 0.1);
+        .nav-tab {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: none;
+            background: transparent;
+        }
+
+        .nav-tab:hover {
+            background: var(--bg-hover);
             color: var(--text-primary);
         }
 
-        .nav-item.active {
-            background: linear-gradient(90deg, rgba(59, 130, 246, 0.2) 0%, transparent 100%);
-            color: var(--accent-cyan);
-            border-left-color: var(--accent-cyan);
+        .nav-tab.active {
+            background: var(--blue-light);
+            color: var(--blue);
         }
 
-        .nav-item i {
-            width: 20px;
-            text-align: center;
-            font-size: 16px;
+        .nav-tab i {
+            font-size: 14px;
         }
 
-        .system-status {
-            padding: 16px;
-            border-top: 1px solid var(--border);
-        }
-
-        .status-indicator {
+        .add-tab {
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 12px;
-            background: rgba(34, 197, 94, 0.1);
-            border: 1px solid rgba(34, 197, 94, 0.3);
-            border-radius: 8px;
+            justify-content: center;
+            border-radius: 6px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.2s;
         }
 
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            background: var(--success);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
+        .add-tab:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-            50% { opacity: 0.8; box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            gap: 8px;
+            border-bottom: 1px solid var(--border-light);
         }
 
-        .status-text {
-            font-weight: 600;
-            color: var(--success);
+        .toolbar-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .toolbar-btn:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .toolbar-divider {
+            width: 1px;
+            height: 24px;
+            background: var(--border);
+            margin: 0 4px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            margin-left: auto;
+            min-width: 240px;
+        }
+
+        .search-box i {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .search-box input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 13px;
+            color: var(--text-primary);
+            width: 100%;
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-muted);
         }
 
         /* Main Content */
         .main-content {
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            overflow: auto;
+            background: var(--bg-primary);
         }
 
-        /* Top Bar */
-        .top-bar {
-            height: var(--header-height);
-            background: var(--bg-panel);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 24px;
+        /* Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
         }
 
-        .page-title {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .page-title h1 {
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        .badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 11px;
+        .data-table th {
+            text-align: left;
+            padding: 12px 16px;
             font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-primary);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            white-space: nowrap;
         }
 
-        .badge-online {
-            background: rgba(34, 197, 94, 0.2);
-            color: var(--success);
-            border: 1px solid rgba(34, 197, 94, 0.4);
+        .data-table th i {
+            margin-right: 6px;
+            font-size: 12px;
         }
 
-        .top-actions {
+        .data-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-light);
+            vertical-align: middle;
+        }
+
+        .data-table tr:hover td {
+            background: var(--bg-hover);
+        }
+
+        .data-table tr.selected td {
+            background: var(--blue-light);
+        }
+
+        /* Row Number */
+        .row-num {
+            color: var(--text-muted);
+            font-size: 12px;
+            width: 40px;
+            text-align: center;
+        }
+
+        /* Checkbox */
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border);
+            border-radius: 3px;
+            cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: center;
+            transition: all 0.2s;
         }
 
-        .btn {
+        .checkbox:hover {
+            border-color: var(--blue);
+        }
+
+        .checkbox.checked {
+            background: var(--blue);
+            border-color: var(--blue);
+            color: white;
+        }
+
+        /* Cell Content */
+        .cell-text {
+            color: var(--text-primary);
+        }
+
+        .cell-link {
+            color: var(--blue);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .cell-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Status Badges */
+        .status-badge {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .status-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .status-done {
+            background: var(--green-light);
+            color: var(--green);
+        }
+
+        .status-done::before {
+            background: var(--green);
+        }
+
+        .status-progress {
+            background: var(--blue-light);
+            color: var(--blue);
+        }
+
+        .status-progress::before {
+            background: var(--blue);
+        }
+
+        .status-pending {
+            background: var(--yellow-light);
+            color: #b06000;
+        }
+
+        .status-pending::before {
+            background: var(--yellow);
+        }
+
+        .status-new {
+            background: var(--cyan-light);
+            color: #00838f;
+        }
+
+        .status-new::before {
+            background: var(--cyan);
+        }
+
+        .status-hold {
+            background: var(--orange-light);
+            color: #e65100;
+        }
+
+        .status-hold::before {
+            background: var(--orange);
+        }
+
+        .status-cancel {
+            background: var(--red-light);
+            color: var(--red);
+        }
+
+        .status-cancel::before {
+            background: var(--red);
+        }
+
+        /* Action Buttons */
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s;
+            border: none;
+            transition: all 0.2s;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-cyan) 100%);
+            background: var(--blue);
             color: white;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+            background: #1557b0;
+            box-shadow: 0 2px 8px rgba(26, 115, 232, 0.3);
         }
 
         .btn-secondary {
-            background: var(--bg-card);
-            color: var(--text-primary);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
             border: 1px solid var(--border);
         }
 
         .btn-secondary:hover {
-            background: var(--border);
-        }
-
-        .btn-icon {
-            width: 40px;
-            height: 40px;
-            padding: 0;
-            justify-content: center;
-            font-size: 16px;
-        }
-
-        /* Dashboard Grid */
-        .dashboard {
-            flex: 1;
-            padding: 24px;
-            overflow-y: auto;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-template-rows: auto auto 1fr;
-            gap: 20px;
-        }
-
-        /* Cards */
-        .card {
-            background: var(--bg-panel);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .card-header {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .card-title {
-            font-size: 14px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .card-title i {
-            color: var(--accent-cyan);
-        }
-
-        .card-body {
-            padding: 20px;
-        }
-
-        /* Control Value Cards */
-        .control-card {
-            background: linear-gradient(135deg, var(--bg-panel) 0%, var(--bg-card) 100%);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .control-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-        }
-
-        .control-card.blue::before { background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan)); }
-        .control-card.green::before { background: linear-gradient(90deg, var(--accent-green), #34d399); }
-        .control-card.yellow::before { background: linear-gradient(90deg, var(--accent-yellow), #fbbf24); }
-        .control-card.purple::before { background: linear-gradient(90deg, var(--accent-purple), #a78bfa); }
-
-        .control-label {
-            font-size: 12px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 12px;
-        }
-
-        .control-value {
-            font-size: 36px;
-            font-weight: 800;
-            font-family: 'Courier New', monospace;
-            margin-bottom: 16px;
-        }
-
-        .control-card.blue .control-value { color: var(--accent-cyan); }
-        .control-card.green .control-value { color: var(--accent-green); }
-        .control-card.yellow .control-value { color: var(--accent-yellow); }
-        .control-card.purple .control-value { color: var(--accent-purple); }
-
-        .control-input-group {
-            display: flex;
-            gap: 8px;
-        }
-
-        .control-input {
-            flex: 1;
-            padding: 10px 14px;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 8px;
+            background: var(--bg-hover);
             color: var(--text-primary);
-            font-size: 14px;
-            font-family: 'Courier New', monospace;
-            text-align: center;
         }
 
-        .control-input:focus {
-            outline: none;
-            border-color: var(--accent-cyan);
-            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
-        }
-
-        .control-btn {
-            width: 40px;
-            height: 40px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.2s;
-        }
-
-        .control-btn.set {
-            background: var(--accent-blue);
-            color: white;
-        }
-
-        .control-btn.set:hover {
-            background: var(--accent-cyan);
-        }
-
-        /* Toggle Switches */
-        .switch-container {
-            display: flex;
+        /* Priority Tags */
+        .priority-tag {
+            display: inline-flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 16px 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .switch-container:last-child {
-            border-bottom: none;
-        }
-
-        .switch-label {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .switch-icon {
-            width: 36px;
-            height: 36px;
-            background: var(--bg-card);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--accent-cyan);
-        }
-
-        .switch-text {
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
             font-weight: 600;
         }
 
-        .switch-sub {
-            font-size: 11px;
-            color: var(--text-secondary);
+        .priority-high {
+            background: var(--red-light);
+            color: var(--red);
         }
 
-        .toggle-switch {
-            position: relative;
-            width: 56px;
-            height: 28px;
+        .priority-medium {
+            background: var(--yellow-light);
+            color: #b06000;
         }
 
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
+        .priority-low {
+            background: var(--green-light);
+            color: var(--green);
         }
 
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--bg-input);
-            border-radius: 28px;
-            transition: 0.3s;
-            border: 1px solid var(--border);
-        }
-
-        .toggle-slider::before {
-            position: absolute;
-            content: '';
-            height: 20px;
-            width: 20px;
-            left: 3px;
-            bottom: 3px;
-            background: var(--text-secondary);
-            border-radius: 50%;
-            transition: 0.3s;
-        }
-
-        .toggle-switch input:checked + .toggle-slider {
-            background: rgba(34, 197, 94, 0.3);
-            border-color: var(--success);
-        }
-
-        .toggle-switch input:checked + .toggle-slider::before {
-            transform: translateX(28px);
-            background: var(--success);
-            box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
-        }
-
-        /* Gantt Chart */
-        .gantt-section {
-            grid-column: span 3;
-        }
-
-        .gantt-toolbar {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .gantt-nav {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--bg-card);
-            padding: 4px;
-            border-radius: 8px;
-        }
-
-        .gantt-nav-btn {
+        /* Avatar */
+        .avatar {
             width: 32px;
             height: 32px;
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .gantt-nav-btn:hover {
-            background: var(--border);
-            color: var(--text-primary);
-        }
-
-        .gantt-date {
-            padding: 0 16px;
-            font-weight: 600;
-            min-width: 140px;
-            text-align: center;
-        }
-
-        .gantt-chart {
+            border-radius: 50%;
+            background: var(--blue);
+            color: white;
             display: flex;
-            height: 300px;
-            background: var(--bg-card);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .gantt-tasks {
-            width: 200px;
-            border-right: 1px solid var(--border);
-            overflow-y: auto;
-        }
-
-        .gantt-task-item {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .gantt-task-item:hover {
-            background: var(--bg-input);
-        }
-
-        .gantt-task-item.selected {
-            background: rgba(59, 130, 246, 0.2);
-            border-left: 3px solid var(--accent-blue);
-        }
-
-        .gantt-task-id {
-            font-weight: 600;
-            font-size: 12px;
-            margin-bottom: 4px;
-        }
-
-        .gantt-task-name {
-            font-size: 11px;
-            color: var(--text-secondary);
-        }
-
-        .gantt-timeline {
-            flex: 1;
-            position: relative;
-            overflow-x: auto;
-        }
-
-        .gantt-header-row {
-            display: flex;
-            height: 40px;
-            background: var(--bg-panel);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .gantt-day {
-            width: 60px;
-            display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            border-right: 1px solid var(--border);
-            font-size: 11px;
-        }
-
-        .gantt-day-name {
-            color: var(--text-secondary);
-        }
-
-        .gantt-day-num {
+            font-size: 12px;
             font-weight: 600;
         }
 
-        .gantt-bars-container {
-            position: relative;
-            min-width: 840px;
-        }
-
-        .gantt-bar-row {
-            height: 50px;
-            border-bottom: 1px solid var(--border);
-            position: relative;
-        }
-
-        .gantt-bar {
-            position: absolute;
-            height: 32px;
-            top: 9px;
-            border-radius: 6px;
+        /* Bottom Bar */
+        .bottom-bar {
             display: flex;
             align-items: center;
-            padding: 0 12px;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            white-space: nowrap;
+            padding: 12px 16px;
+            border-top: 1px solid var(--border);
+            background: var(--bg-primary);
+            gap: 16px;
         }
 
-        .gantt-bar:hover {
-            transform: translateY(-2px);
-            filter: brightness(1.2);
-        }
-
-        .gantt-bar.pending {
-            background: linear-gradient(90deg, var(--accent-yellow), #fbbf24);
-            color: #000;
-        }
-
-        .gantt-bar.progress {
-            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
-            color: white;
-        }
-
-        .gantt-bar.complete {
-            background: linear-gradient(90deg, var(--accent-green), #34d399);
-            color: white;
-        }
-
-        /* Quick Actions Panel */
-        .quick-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .action-btn-large {
+        .stats {
             display: flex;
             align-items: center;
             gap: 16px;
-            padding: 20px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: left;
+            font-size: 12px;
+            color: var(--text-secondary);
         }
 
-        .action-btn-large:hover {
-            background: var(--bg-input);
-            border-color: var(--accent-cyan);
-            transform: translateX(4px);
-        }
-
-        .action-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
+        .stat-item {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 20px;
+            gap: 6px;
         }
 
-        .action-icon.blue { background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); }
-        .action-icon.green { background: rgba(34, 197, 94, 0.2); color: var(--accent-green); }
-        .action-icon.yellow { background: rgba(245, 158, 11, 0.2); color: var(--accent-yellow); }
-        .action-icon.red { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); }
-
-        .action-text {
-            flex: 1;
+        .stat-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
         }
 
-        .action-title {
-            font-weight: 700;
-            font-size: 14px;
-            margin-bottom: 4px;
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
         }
 
-        .action-desc {
-            font-size: 11px;
+        .page-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-primary);
             color: var(--text-secondary);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .page-btn:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .page-btn.active {
+            background: var(--blue);
+            color: white;
+            border-color: var(--blue);
+        }
+
+        /* Add Row Button */
+        .add-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .add-row:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
         }
 
         /* Modal */
@@ -722,8 +503,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(8px);
+            background: rgba(0,0,0,0.5);
             z-index: 1000;
             align-items: center;
             justify-content: center;
@@ -734,17 +514,17 @@
         }
 
         .modal {
-            background: var(--bg-panel);
-            border: 1px solid var(--border);
-            border-radius: 16px;
+            background: var(--bg-primary);
+            border-radius: 12px;
             width: 90%;
             max-width: 600px;
             max-height: 90vh;
             overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
         }
 
         .modal-header {
-            padding: 24px;
+            padding: 20px 24px;
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
@@ -753,29 +533,29 @@
 
         .modal-title {
             font-size: 18px;
-            font-weight: 700;
+            font-weight: 600;
         }
 
         .modal-close {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             border: none;
-            background: var(--bg-card);
-            border-radius: 8px;
+            background: transparent;
+            border-radius: 6px;
             cursor: pointer;
-            color: var(--text-secondary);
+            color: var(--text-muted);
             font-size: 18px;
         }
 
         .modal-close:hover {
-            background: var(--accent-red);
-            color: white;
+            background: var(--bg-hover);
+            color: var(--text-primary);
         }
 
         .modal-body {
             padding: 24px;
             overflow-y: auto;
-            max-height: calc(90vh - 160px);
+            max-height: calc(90vh - 140px);
         }
 
         .form-row {
@@ -794,35 +574,29 @@
             font-size: 12px;
             font-weight: 600;
             color: var(--text-secondary);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         .form-input, .form-select, .form-textarea {
             width: 100%;
-            padding: 12px 16px;
-            background: var(--bg-input);
+            padding: 10px 14px;
             border: 1px solid var(--border);
             border-radius: 8px;
-            color: var(--text-primary);
             font-size: 14px;
-            transition: all 0.3s;
+            transition: all 0.2s;
+            background: var(--bg-primary);
         }
 
         .form-input:focus, .form-select:focus, .form-textarea:focus {
             outline: none;
-            border-color: var(--accent-cyan);
-            box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.2);
-        }
-
-        .form-textarea {
-            resize: vertical;
-            min-height: 100px;
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px var(--blue-light);
         }
 
         .modal-footer {
-            padding: 20px 24px;
+            padding: 16px 24px;
             border-top: 1px solid var(--border);
             display: flex;
             justify-content: flex-end;
@@ -836,7 +610,7 @@
         }
 
         ::-webkit-scrollbar-track {
-            background: var(--bg-card);
+            background: transparent;
         }
 
         ::-webkit-scrollbar-thumb {
@@ -845,305 +619,135 @@
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: var(--text-secondary);
+            background: var(--text-muted);
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <div class="logo-icon">
-                        <i class="fas fa-microchip"></i>
-                    </div>
-                    <div>
-                        <div class="logo-text">SCADA</div>
-                        <div class="logo-sub">生產控制系統</div>
-                    </div>
-                </div>
+    <div class="app">
+        <!-- Top Navigation -->
+        <nav class="top-nav">
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="switchTab(this, 'orders')">
+                    <i class="fas fa-clipboard-list"></i>
+                    工單列表
+                </button>
+                <button class="nav-tab" onclick="switchTab(this, 'schedule')">
+                    <i class="fas fa-calendar-alt"></i>
+                    生產排程
+                </button>
+                <button class="nav-tab" onclick="switchTab(this, 'kanban')">
+                    <i class="fas fa-columns"></i>
+                    看板
+                </button>
+                <button class="nav-tab" onclick="switchTab(this, 'resources')">
+                    <i class="fas fa-cogs"></i>
+                    資源管理
+                </button>
+                <button class="nav-tab" onclick="switchTab(this, 'reports')">
+                    <i class="fas fa-chart-bar"></i>
+                    報表分析
+                </button>
             </div>
-
-            <nav class="sidebar-nav">
-                <div class="nav-section">
-                    <div class="nav-section-title">主要功能</div>
-                    <div class="nav-item active">
-                        <i class="fas fa-tachometer-alt"></i>
-                        <span>控制面板</span>
-                    </div>
-                    <div class="nav-item">
-                        <i class="fas fa-project-diagram"></i>
-                        <span>產線監控</span>
-                    </div>
-                    <div class="nav-item">
-                        <i class="fas fa-clipboard-check"></i>
-                        <span>工單管理</span>
-                    </div>
-                    <div class="nav-item">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>數據分析</span>
-                    </div>
-                </div>
-
-                <div class="nav-section">
-                    <div class="nav-section-title">系統設定</div>
-                    <div class="nav-item">
-                        <i class="fas fa-sliders-h"></i>
-                        <span>參數設定</span>
-                    </div>
-                    <div class="nav-item">
-                        <i class="fas fa-history"></i>
-                        <span>操作記錄</span>
-                    </div>
-                    <div class="nav-item">
-                        <i class="fas fa-cog"></i>
-                        <span>系統設定</span>
-                    </div>
-                </div>
-            </nav>
-
-            <div class="system-status">
-                <div class="status-indicator">
-                    <div class="status-dot"></div>
-                    <span class="status-text">系統運作中</span>
-                </div>
+            <div class="add-tab" onclick="addNewTab()">
+                <i class="fas fa-plus"></i>
             </div>
-        </aside>
+        </nav>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <button class="toolbar-btn" title="新增" onclick="openModal()">
+                <i class="fas fa-plus"></i>
+            </button>
+            <button class="toolbar-btn" title="編輯" onclick="editSelected()">
+                <i class="fas fa-edit"></i>
+            </button>
+            <button class="toolbar-btn" title="刪除" onclick="deleteSelected()">
+                <i class="fas fa-trash"></i>
+            </button>
+            <div class="toolbar-divider"></div>
+            <button class="toolbar-btn" title="篩選">
+                <i class="fas fa-filter"></i>
+            </button>
+            <button class="toolbar-btn" title="排序">
+                <i class="fas fa-sort"></i>
+            </button>
+            <button class="toolbar-btn" title="分組">
+                <i class="fas fa-layer-group"></i>
+            </button>
+            <div class="toolbar-divider"></div>
+            <button class="toolbar-btn" title="匯入">
+                <i class="fas fa-file-import"></i>
+            </button>
+            <button class="toolbar-btn" title="匯出">
+                <i class="fas fa-file-export"></i>
+            </button>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="搜尋工單..." id="searchInput" onkeyup="searchOrders()">
+            </div>
+        </div>
 
         <!-- Main Content -->
-        <main class="main-content">
-            <!-- Top Bar -->
-            <header class="top-bar">
-                <div class="page-title">
-                    <h1>生產控制面板</h1>
-                    <span class="badge badge-online">● 即時連線中</span>
+        <div class="main-content">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40px;">
+                            <div class="checkbox" onclick="toggleSelectAll()" id="selectAll"></div>
+                        </th>
+                        <th><i class="fas fa-hashtag"></i>序號</th>
+                        <th><i class="fas fa-file-alt"></i>工單編號</th>
+                        <th><i class="fas fa-box"></i>產品名稱</th>
+                        <th><i class="fas fa-industry"></i>產線</th>
+                        <th><i class="fas fa-flag"></i>狀態</th>
+                        <th><i class="fas fa-exclamation-circle"></i>優先級</th>
+                        <th><i class="fas fa-calendar"></i>開始日期</th>
+                        <th><i class="fas fa-calendar-check"></i>結束日期</th>
+                        <th><i class="fas fa-sort-numeric-up"></i>數量</th>
+                        <th><i class="fas fa-user"></i>負責人</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Data will be inserted by JS -->
+                </tbody>
+            </table>
+
+            <div class="add-row" onclick="openModal()">
+                <i class="fas fa-plus"></i>
+                <span>新增工單</span>
+            </div>
+        </div>
+
+        <!-- Bottom Bar -->
+        <div class="bottom-bar">
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-dot" style="background: var(--green);"></div>
+                    <span>已完成: <strong id="stat-done">0</strong></span>
                 </div>
-
-                <div class="top-actions">
-                    <button class="btn btn-secondary btn-icon">
-                        <i class="fas fa-bell"></i>
-                    </button>
-                    <button class="btn btn-secondary btn-icon">
-                        <i class="fas fa-expand"></i>
-                    </button>
-                    <button class="btn btn-primary" onclick="openModal()">
-                        <i class="fas fa-plus"></i>
-                        新增工單
-                    </button>
+                <div class="stat-item">
+                    <div class="stat-dot" style="background: var(--blue);"></div>
+                    <span>進行中: <strong id="stat-progress">0</strong></span>
                 </div>
-            </header>
-
-            <!-- Dashboard -->
-            <div class="dashboard">
-                <!-- Control Value Cards -->
-                <div class="control-card blue">
-                    <div class="control-label">目標產量 (件/小時)</div>
-                    <div class="control-value" id="target-output">1,250</div>
-                    <div class="control-input-group">
-                        <input type="number" class="control-input" id="input-target" value="1250" min="0">
-                        <button class="control-btn set" onclick="setValue('target', 'input-target', 'target-output')">
-                            <i class="fas fa-check"></i>
-                        </button>
-                    </div>
+                <div class="stat-item">
+                    <div class="stat-dot" style="background: var(--yellow);"></div>
+                    <span>待產: <strong id="stat-pending">0</strong></span>
                 </div>
-
-                <div class="control-card green">
-                    <div class="control-label">目前產量 (件/小時)</div>
-                    <div class="control-value" id="current-output">1,180</div>
-                    <div class="control-input-group">
-                        <input type="number" class="control-input" id="input-current" value="1180" min="0">
-                        <button class="control-btn set" onclick="setValue('current', 'input-current', 'current-output')">
-                            <i class="fas fa-check"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="control-card yellow">
-                    <div class="control-label">產線速度 (m/min)</div>
-                    <div class="control-value" id="line-speed">45.5</div>
-                    <div class="control-input-group">
-                        <input type="number" class="control-input" id="input-speed" value="45.5" min="0" step="0.1">
-                        <button class="control-btn set" onclick="setValue('speed', 'input-speed', 'line-speed')">
-                            <i class="fas fa-check"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="control-card purple">
-                    <div class="control-label">溫度設定 (°C)</div>
-                    <div class="control-value" id="temperature">185.0</div>
-                    <div class="control-input-group">
-                        <input type="number" class="control-input" id="input-temp" value="185" min="0" step="0.5">
-                        <button class="control-btn set" onclick="setValue('temp', 'input-temp', 'temperature')">
-                            <i class="fas fa-check"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Device Controls -->
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <i class="fas fa-power-off"></i>
-                            設備控制
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="switch-container">
-                            <div class="switch-label">
-                                <div class="switch-icon">
-                                    <i class="fas fa-play"></i>
-                                </div>
-                                <div>
-                                    <div class="switch-text">產線運轉</div>
-                                    <div class="switch-sub">主生產線啟動/停止</div>
-                                </div>
-                            </div>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="switch-line" checked onchange="toggleDevice('line', this.checked)">
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-
-                        <div class="switch-container">
-                            <div class="switch-label">
-                                <div class="switch-icon">
-                                    <i class="fas fa-fan"></i>
-                                </div>
-                                <div>
-                                    <div class="switch-text">冷卻系統</div>
-                                    <div class="switch-sub">冷卻風扇控制</div>
-                                </div>
-                            </div>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="switch-cool" checked onchange="toggleDevice('cool', this.checked)">
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-
-                        <div class="switch-container">
-                            <div class="switch-label">
-                                <div class="switch-icon">
-                                    <i class="fas fa-lightbulb"></i>
-                                </div>
-                                <div>
-                                    <div class="switch-text">警示燈號</div>
-                                    <div class="switch-sub">狀態指示燈控制</div>
-                                </div>
-                            </div>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="switch-light" onchange="toggleDevice('light', this.checked)">
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-
-                        <div class="switch-container">
-                            <div class="switch-label">
-                                <div class="switch-icon">
-                                    <i class="fas fa-robot"></i>
-                                </div>
-                                <div>
-                                    <div class="switch-text">自動模式</div>
-                                    <div class="switch-sub">自動化生產控制</div>
-                                </div>
-                            </div>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="switch-auto" checked onchange="toggleDevice('auto', this.checked)">
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Gantt Chart -->
-                <div class="card gantt-section">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <i class="fas fa-chart-gantt"></i>
-                            生產排程甘特圖
-                        </div>
-                        <div class="gantt-toolbar">
-                            <div class="gantt-nav">
-                                <button class="gantt-nav-btn" onclick="changeWeek(-1)">
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
-                                <span class="gantt-date" id="gantt-date">2024年 3月</span>
-                                <button class="gantt-nav-btn" onclick="changeWeek(1)">
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body" style="padding: 0;">
-                        <div class="gantt-chart">
-                            <div class="gantt-tasks" id="gantt-tasks"></div>
-                            <div class="gantt-timeline">
-                                <div class="gantt-header-row" id="gantt-header"></div>
-                                <div class="gantt-bars-container" id="gantt-bars"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Quick Actions -->
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <i class="fas fa-bolt"></i>
-                            快速操作
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="quick-actions">
-                            <button class="action-btn-large" onclick="emergencyStop()">
-                                <div class="action-icon red">
-                                    <i class="fas fa-stop-circle"></i>
-                                </div>
-                                <div class="action-text">
-                                    <div class="action-title">緊急停止</div>
-                                    <div class="action-desc">立即停止所有產線運作</div>
-                                </div>
-                                <i class="fas fa-chevron-right" style="color: var(--text-secondary);"></i>
-                            </button>
-
-                            <button class="action-btn-large" onclick="resetCounters()">
-                                <div class="action-icon yellow">
-                                    <i class="fas fa-redo"></i>
-                                </div>
-                                <div class="action-text">
-                                    <div class="action-title">重置計數器</div>
-                                    <div class="action-desc">歸零今日生產計數</div>
-                                </div>
-                                <i class="fas fa-chevron-right" style="color: var(--text-secondary);"></i>
-                            </button>
-
-                            <button class="action-btn-large" onclick="exportData()">
-                                <div class="action-icon blue">
-                                    <i class="fas fa-file-export"></i>
-                                </div>
-                                <div class="action-text">
-                                    <div class="action-title">匯出數據</div>
-                                    <div class="action-desc">下載生產報表 CSV</div>
-                                </div>
-                                <i class="fas fa-chevron-right" style="color: var(--text-secondary);"></i>
-                            </button>
-
-                            <button class="action-btn-large" onclick="openModal()">
-                                <div class="action-icon green">
-                                    <i class="fas fa-plus-circle"></i>
-                                </div>
-                                <div class="action-text">
-                                    <div class="action-title">新增工單</div>
-                                    <div class="action-desc">建立新的生產工單</div>
-                                </div>
-                                <i class="fas fa-chevron-right" style="color: var(--text-secondary);"></i>
-                            </button>
-                        </div>
-                    </div>
+                <div class="stat-item">
+                    <span>總計: <strong id="stat-total">0</strong> 筆</span>
                 </div>
             </div>
-        </main>
+
+            <div class="pagination">
+                <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
     </div>
 
     <!-- Modal -->
@@ -1172,21 +776,6 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">開始日期</label>
-                        <input type="date" id="startDate" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">結束日期</label>
-                        <input type="date" id="endDate" class="form-input" required>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">數量</label>
-                        <input type="number" id="quantity" class="form-input" placeholder="0" min="1" required>
-                    </div>
-                    <div class="form-group">
                         <label class="form-label">產線</label>
                         <select id="productionLine" class="form-select" required>
                             <option value="">選擇產線</option>
@@ -1196,15 +785,46 @@
                             <option value="D線">D線</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label class="form-label">狀態</label>
+                        <select id="status" class="form-select" required>
+                            <option value="pending">待產</option>
+                            <option value="progress">進行中</option>
+                            <option value="done">已完成</option>
+                            <option value="hold">暫停</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">優先級</label>
+                        <select id="priority" class="form-select" required>
+                            <option value="high">高</option>
+                            <option value="medium">中</option>
+                            <option value="low">低</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">數量</label>
+                        <input type="number" id="quantity" class="form-input" placeholder="0" min="1" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">開始日期</label>
+                        <input type="date" id="startDate" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">結束日期</label>
+                        <input type="date" id="endDate" class="form-input" required>
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">狀態</label>
-                    <select id="status" class="form-select" required>
-                        <option value="pending">待產</option>
-                        <option value="progress">生產中</option>
-                        <option value="complete">已完成</option>
-                    </select>
+                    <label class="form-label">負責人</label>
+                    <input type="text" id="assignee" class="form-input" placeholder="負責人姓名">
                 </div>
 
                 <div class="form-group">
@@ -1214,210 +834,160 @@
             </form>
 
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeModal()">取消</button>
-                <button class="btn btn-primary" onclick="saveOrder()">儲存</button>
+                <button class="btn-action btn-secondary" onclick="closeModal()">取消</button>
+                <button class="btn-action btn-primary" onclick="saveOrder()">儲存</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Data
-        let orders = JSON.parse(localStorage.getItem('productionOrders') || '[]');
-        let currentDate = new Date();
-        let deviceStatus = {
-            line: true,
-            cool: true,
-            light: false,
-            auto: true
-        };
+        // Sample Data
+        let orders = JSON.parse(localStorage.getItem('crmOrders') || '[]');
+        let selectedRows = new Set();
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             if (orders.length === 0) {
                 orders = [
-                    { id: '1', orderNo: 'WO-202403-001', productName: '產品A-型號X', quantity: 1000, productionLine: 'A線', status: 'progress', startDate: '2024-03-25', endDate: '2024-03-28', note: '優先處理' },
-                    { id: '2', orderNo: 'WO-202403-002', productName: '產品B-型號Y', quantity: 500, productionLine: 'B線', status: 'pending', startDate: '2024-03-26', endDate: '2024-03-29', note: '' },
-                    { id: '3', orderNo: 'WO-202403-003', productName: '產品C-型號Z', quantity: 2000, productionLine: 'A線', status: 'complete', startDate: '2024-03-20', endDate: '2024-03-24', note: '已完成檢驗' },
-                    { id: '4', orderNo: 'WO-202403-004', productName: '產品D-型號W', quantity: 800, productionLine: 'C線', status: 'progress', startDate: '2024-03-27', endDate: '2024-03-30', note: '' }
+                    { id: '1', orderNo: 'WO-202403-001', productName: '精密軸承-A型', productionLine: 'A線', status: 'done', priority: 'high', startDate: '2024-03-20', endDate: '2024-03-24', quantity: 2000, assignee: '張明遠', note: '' },
+                    { id: '2', orderNo: 'WO-202403-002', productName: '齒輪組-B型', productionLine: 'B線', status: 'progress', priority: 'high', startDate: '2024-03-25', endDate: '2024-03-28', quantity: 1500, assignee: '李思涵', note: '優先處理' },
+                    { id: '3', orderNo: 'WO-202403-003', productName: '連接器-C型', productionLine: 'A線', status: 'pending', priority: 'medium', startDate: '2024-03-26', endDate: '2024-03-29', quantity: 3000, assignee: '王建國', note: '' },
+                    { id: '4', orderNo: 'WO-202403-004', productName: '外殼組件-D型', productionLine: 'C線', status: 'hold', priority: 'low', startDate: '2024-03-27', endDate: '2024-03-30', quantity: 800, assignee: '陳雅芳', note: '材料待確認' },
+                    { id: '5', orderNo: 'WO-202403-005', productName: '電路板-E型', productionLine: 'D線', status: 'progress', priority: 'high', startDate: '2024-03-25', endDate: '2024-03-28', quantity: 1200, assignee: '林志豪', note: '' },
+                    { id: '6', orderNo: 'WO-202403-006', productName: '散熱片-F型', productionLine: 'B線', status: 'pending', priority: 'medium', startDate: '2024-03-28', endDate: '2024-04-01', quantity: 2500, assignee: '黃美玲', note: '' },
+                    { id: '7', orderNo: 'WO-202403-007', productName: '傳動軸-G型', productionLine: 'A線', status: 'done', priority: 'low', startDate: '2024-03-18', endDate: '2024-03-22', quantity: 600, assignee: '劉大偉', note: '已完成檢驗' },
+                    { id: '8', orderNo: 'WO-202403-008', productName: '密封圈-H型', productionLine: 'C線', status: 'pending', priority: 'high', startDate: '2024-03-29', endDate: '2024-04-02', quantity: 5000, assignee: '周小婷', note: '急單' }
                 ];
-                localStorage.setItem('productionOrders', JSON.stringify(orders));
+                localStorage.setItem('crmOrders', JSON.stringify(orders));
             }
-            renderGantt();
-            loadDeviceStatus();
+            renderTable();
+            updateStats();
         });
 
-        // Control Functions
-        function setValue(type, inputId, displayId) {
-            const value = document.getElementById(inputId).value;
-            const display = document.getElementById(displayId);
-            
-            // Animate value change
-            display.style.opacity = '0';
-            setTimeout(() => {
-                display.textContent = parseFloat(value).toLocaleString();
-                display.style.opacity = '1';
-            }, 150);
-            
-            // Save to localStorage
-            localStorage.setItem(`control_${type}`, value);
-            
-            // Show feedback
-            showNotification(`${type} 已設定為 ${value}`);
-        }
+        // Render Table
+        function renderTable(data = orders) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
 
-        function toggleDevice(device, status) {
-            deviceStatus[device] = status;
-            localStorage.setItem('device_status', JSON.stringify(deviceStatus));
-            
-            const names = {
-                line: '產線運轉',
-                cool: '冷卻系統',
-                light: '警示燈號',
-                auto: '自動模式'
-            };
-            
-            showNotification(`${names[device]} 已${status ? '啟動' : '停止'}`);
-        }
+            data.forEach((order, index) => {
+                const statusClass = {
+                    done: 'status-done',
+                    progress: 'status-progress',
+                    pending: 'status-pending',
+                    hold: 'status-hold'
+                }[order.status] || 'status-pending';
 
-        function loadDeviceStatus() {
-            const saved = localStorage.getItem('device_status');
-            if (saved) {
-                deviceStatus = JSON.parse(saved);
-                document.getElementById('switch-line').checked = deviceStatus.line;
-                document.getElementById('switch-cool').checked = deviceStatus.cool;
-                document.getElementById('switch-light').checked = deviceStatus.light;
-                document.getElementById('switch-auto').checked = deviceStatus.auto;
-            }
-            
-            // Load control values
-            ['target', 'current', 'speed', 'temp'].forEach(type => {
-                const saved = localStorage.getItem(`control_${type}`);
-                if (saved) {
-                    document.getElementById(`input-${type}`).value = saved;
-                    document.getElementById(`${type}-output` || `${type === 'target' ? 'target-output' : type === 'current' ? 'current-output' : type === 'speed' ? 'line-speed' : 'temperature'}`).textContent = parseFloat(saved).toLocaleString();
-                }
-            });
-        }
+                const statusText = {
+                    done: '✓ 已完成',
+                    progress: '● 進行中',
+                    pending: '○ 待產',
+                    hold: '◐ 暫停'
+                }[order.status] || '待產';
 
-        function emergencyStop() {
-            if (confirm('確定要執行緊急停止嗎？這將停止所有產線運作。')) {
-                document.getElementById('switch-line').checked = false;
-                toggleDevice('line', false);
-                showNotification('⚠️ 緊急停止已執行', 'error');
-            }
-        }
+                const priorityClass = {
+                    high: 'priority-high',
+                    medium: 'priority-medium',
+                    low: 'priority-low'
+                }[order.priority] || 'priority-medium';
 
-        function resetCounters() {
-            if (confirm('確定要重置今日生產計數嗎？')) {
-                document.getElementById('input-current').value = '0';
-                setValue('current', 'input-current', 'current-output');
-                showNotification('計數器已重置');
-            }
-        }
+                const priorityText = { high: '高', medium: '中', low: '低' }[order.priority] || '中';
 
-        function exportData() {
-            const csv = convertToCSV(orders);
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `production_data_${new Date().toISOString().split('T')[0]}.csv`;
-            a.click();
-            showNotification('數據匯出完成');
-        }
+                const avatar = order.assignee ? order.assignee.charAt(0) : '?';
 
-        function convertToCSV(data) {
-            const headers = ['工單編號', '產品名稱', '數量', '產線', '狀態', '開始日期', '結束日期', '備註'];
-            const rows = data.map(o => [o.orderNo, o.productName, o.quantity, o.productionLine, o.status, o.startDate, o.endDate, o.note]);
-            return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-        }
-
-        function showNotification(message, type = 'success') {
-            // Create notification element
-            const notif = document.createElement('div');
-            notif.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 16px 24px;
-                background: ${type === 'error' ? 'var(--accent-red)' : 'var(--accent-green)'};
-                color: white;
-                border-radius: 8px;
-                font-weight: 600;
-                z-index: 9999;
-                animation: slideIn 0.3s ease;
-            `;
-            notif.textContent = message;
-            document.body.appendChild(notif);
-            
-            setTimeout(() => {
-                notif.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => notif.remove(), 300);
-            }, 3000);
-        }
-
-        // Gantt Chart
-        function renderGantt() {
-            const year = currentDate.getFullYear();
-            const month = currentDate.getMonth();
-            document.getElementById('gantt-date').textContent = `${year}年 ${month + 1}月`;
-
-            // Header
-            const header = document.getElementById('gantt-header');
-            header.innerHTML = '';
-            const startOfWeek = new Date(currentDate);
-            startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
-            
-            for (let i = 0; i < 14; i++) {
-                const day = new Date(startOfWeek);
-                day.setDate(startOfWeek.getDate() + i);
-                header.innerHTML += `
-                    <div class="gantt-day">
-                        <div class="gantt-day-name">${['日','一','二','三','四','五','六'][day.getDay()]}</div>
-                        <div class="gantt-day-num">${day.getDate()}</div>
-                    </div>
-                `;
-            }
-
-            // Tasks and bars
-            const tasksContainer = document.getElementById('gantt-tasks');
-            const barsContainer = document.getElementById('gantt-bars');
-            tasksContainer.innerHTML = '';
-            barsContainer.innerHTML = '';
-
-            orders.forEach(order => {
-                tasksContainer.innerHTML += `
-                    <div class="gantt-task-item">
-                        <div class="gantt-task-id">${order.orderNo}</div>
-                        <div class="gantt-task-name">${order.productName}</div>
-                    </div>
-                `;
-
-                const orderStart = new Date(order.startDate);
-                const orderEnd = new Date(order.endDate);
-                const dayWidth = 60;
-                let startOffset = (orderStart - startOfWeek) / (1000 * 60 * 60 * 24);
-                let duration = (orderEnd - orderStart) / (1000 * 60 * 60 * 24) + 1;
-                
-                if (startOffset < 0) { duration += startOffset; startOffset = 0; }
-                if (startOffset + duration > 14) duration = 14 - startOffset;
-                
-                barsContainer.innerHTML += `
-                    <div class="gantt-bar-row">
-                        ${duration > 0 ? `
-                            <div class="gantt-bar ${order.status}" 
-                                 style="left: ${startOffset * dayWidth}px; width: ${duration * dayWidth - 10}px;">
-                                ${order.orderNo}
+                tbody.innerHTML += `
+                    <tr onclick="selectRow('${order.id}', this)">
+                        <td>
+                            <div class="checkbox ${selectedRows.has(order.id) ? 'checked' : ''}" 
+                                 onclick="toggleCheckbox(event, '${order.id}')">
+                                ${selectedRows.has(order.id) ? '<i class="fas fa-check"></i>' : ''}
                             </div>
-                        ` : ''}
-                    </div>
+                        </td>
+                        <td class="row-num">${index + 1}</td>
+                        <td><span class="cell-link">${order.orderNo}</span></td>
+                        <td><span class="cell-text">${order.productName}</span></td>
+                        <td><span class="cell-text">${order.productionLine}</span></td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td><span class="priority-tag ${priorityClass}">${priorityText}</span></td>
+                        <td><span class="cell-text">${order.startDate}</span></td>
+                        <td><span class="cell-text">${order.endDate}</span></td>
+                        <td><span class="cell-text">${order.quantity.toLocaleString()}</span></td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="avatar">${avatar}</div>
+                                <span>${order.assignee || '-'}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <button class="btn-action btn-primary" onclick="editOrder(event, '${order.id}')">
+                                編輯
+                            </button>
+                        </td>
+                    </tr>
                 `;
             });
         }
 
-        function changeWeek(delta) {
-            currentDate.setDate(currentDate.getDate() + delta * 7);
-            renderGantt();
+        // Selection
+        function toggleCheckbox(event, id) {
+            event.stopPropagation();
+            if (selectedRows.has(id)) {
+                selectedRows.delete(id);
+            } else {
+                selectedRows.add(id);
+            }
+            renderTable();
+        }
+
+        function selectRow(id, row) {
+            document.querySelectorAll('.data-table tr').forEach(r => r.classList.remove('selected'));
+            row.classList.add('selected');
+        }
+
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            if (selectedRows.size === orders.length) {
+                selectedRows.clear();
+                selectAll.classList.remove('checked');
+                selectAll.innerHTML = '';
+            } else {
+                orders.forEach(o => selectedRows.add(o.id));
+                selectAll.classList.add('checked');
+                selectAll.innerHTML = '<i class="fas fa-check"></i>';
+            }
+            renderTable();
+        }
+
+        // Stats
+        function updateStats() {
+            document.getElementById('stat-done').textContent = orders.filter(o => o.status === 'done').length;
+            document.getElementById('stat-progress').textContent = orders.filter(o => o.status === 'progress').length;
+            document.getElementById('stat-pending').textContent = orders.filter(o => o.status === 'pending').length;
+            document.getElementById('stat-total').textContent = orders.length;
+        }
+
+        // Search
+        function searchOrders() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = orders.filter(o => 
+                o.orderNo.toLowerCase().includes(query) ||
+                o.productName.toLowerCase().includes(query) ||
+                o.assignee.toLowerCase().includes(query)
+            );
+            renderTable(filtered);
+        }
+
+        // Tab Switching
+        function switchTab(tab, view) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            // View switching logic would go here
+        }
+
+        function addNewTab() {
+            const name = prompt('輸入新分頁名稱:');
+            if (name) {
+                // Add new tab logic
+            }
         }
 
         // Modal
@@ -1445,11 +1015,13 @@
                 id: document.getElementById('orderId').value || Date.now().toString(),
                 orderNo: document.getElementById('orderNo').value,
                 productName: document.getElementById('productName').value,
-                startDate: document.getElementById('startDate').value,
-                endDate: document.getElementById('endDate').value,
-                quantity: document.getElementById('quantity').value,
                 productionLine: document.getElementById('productionLine').value,
                 status: document.getElementById('status').value,
+                priority: document.getElementById('priority').value,
+                quantity: parseInt(document.getElementById('quantity').value),
+                startDate: document.getElementById('startDate').value,
+                endDate: document.getElementById('endDate').value,
+                assignee: document.getElementById('assignee').value,
                 note: document.getElementById('note').value
             };
 
@@ -1460,30 +1032,59 @@
                 orders.push(orderData);
             }
 
-            localStorage.setItem('productionOrders', JSON.stringify(orders));
+            localStorage.setItem('crmOrders', JSON.stringify(orders));
             closeModal();
-            renderGantt();
-            showNotification('工單已儲存');
+            renderTable();
+            updateStats();
+        }
+
+        function editOrder(event, id) {
+            event.stopPropagation();
+            const order = orders.find(o => o.id === id);
+            if (!order) return;
+
+            document.getElementById('modal').classList.add('active');
+            document.getElementById('orderId').value = order.id;
+            document.getElementById('orderNo').value = order.orderNo;
+            document.getElementById('productName').value = order.productName;
+            document.getElementById('productionLine').value = order.productionLine;
+            document.getElementById('status').value = order.status;
+            document.getElementById('priority').value = order.priority;
+            document.getElementById('quantity').value = order.quantity;
+            document.getElementById('startDate').value = order.startDate;
+            document.getElementById('endDate').value = order.endDate;
+            document.getElementById('assignee').value = order.assignee;
+            document.getElementById('note').value = order.note || '';
+            document.getElementById('modal-title').textContent = '編輯工單';
+        }
+
+        function editSelected() {
+            if (selectedRows.size !== 1) {
+                alert('請選擇一個工單進行編輯');
+                return;
+            }
+            const id = Array.from(selectedRows)[0];
+            editOrder({ stopPropagation: () => {} }, id);
+        }
+
+        function deleteSelected() {
+            if (selectedRows.size === 0) {
+                alert('請選擇要刪除的工單');
+                return;
+            }
+            if (!confirm(`確定要刪除 ${selectedRows.size} 筆工單嗎？`)) return;
+
+            orders = orders.filter(o => !selectedRows.has(o.id));
+            selectedRows.clear();
+            localStorage.setItem('crmOrders', JSON.stringify(orders));
+            renderTable();
+            updateStats();
         }
 
         // Close modal on overlay click
         document.getElementById('modal').addEventListener('click', function(e) {
             if (e.target === this) closeModal();
         });
-
-        // Add animation styles
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideIn {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-            @keyframes slideOut {
-                from { transform: translateX(0); opacity: 1; }
-                to { transform: translateX(100%); opacity: 0; }
-            }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
 </html>
