@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM 生產排程管理系統</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-hover: #f1f3f4;
+            --border: #e0e0e0;
+            --border-light: #f0f0f0;
+            --text-primary: #202124;
+            --text-secondary: #5f6368;
+            --text-muted: #9aa0a6;
+            --blue: #1a73e8;
+            --blue-light: #e8f0fe;
+            --green: #34a853;
+            --green-light: #e6f4ea;
+            --yellow: #fbbc04;
+            --yellow-light: #fef3e8;
+            --orange: #f9ab00;
+            --orange-light: #fff3e0;
+            --red: #ea4335;
+            --red-light: #fce8e6;
+            --purple: #9c27b0;
+            --purple-light: #f3e5f5;
+            --cyan: #00bcd4;
+            --cyan-light: #e0f7fa;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 14px;
+            line-height: 1.5;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* App Container */
+        .app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Top Navigation */
+        .top-nav {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border);
+            gap: 8px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .nav-tab {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: none;
+            background: transparent;
+        }
+
+        .nav-tab:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .nav-tab.active {
+            background: var(--blue-light);
+            color: var(--blue);
+        }
+
+        .nav-tab i {
+            font-size: 14px;
+        }
+
+        .add-tab {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .add-tab:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            gap: 8px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .toolbar-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .toolbar-btn:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .toolbar-divider {
+            width: 1px;
+            height: 24px;
+            background: var(--border);
+            margin: 0 4px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            margin-left: auto;
+            min-width: 240px;
+        }
+
+        .search-box i {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .search-box input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 13px;
+            color: var(--text-primary);
+            width: 100%;
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            overflow: auto;
+            background: var(--bg-primary);
+        }
+
+        /* Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-primary);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            white-space: nowrap;
+        }
+
+        .data-table th i {
+            margin-right: 6px;
+            font-size: 12px;
+        }
+
+        .data-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-light);
+            vertical-align: middle;
+        }
+
+        .data-table tr:hover td {
+            background: var(--bg-hover);
+        }
+
+        .data-table tr.selected td {
+            background: var(--blue-light);
+        }
+
+        /* Row Number */
+        .row-num {
+            color: var(--text-muted);
+            font-size: 12px;
+            width: 40px;
+            text-align: center;
+        }
+
+        /* Checkbox */
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border);
+            border-radius: 3px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .checkbox:hover {
+            border-color: var(--blue);
+        }
+
+        .checkbox.checked {
+            background: var(--blue);
+            border-color: var(--blue);
+            color: white;
+        }
+
+        /* Cell Content */
+        .cell-text {
+            color: var(--text-primary);
+        }
+
+        .cell-link {
+            color: var(--blue);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .cell-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .status-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .status-done {
+            background: var(--green-light);
+            color: var(--green);
+        }
+
+        .status-done::before {
+            background: var(--green);
+        }
+
+        .status-progress {
+            background: var(--blue-light);
+            color: var(--blue);
+        }
+
+        .status-progress::before {
+            background: var(--blue);
+        }
+
+        .status-pending {
+            background: var(--yellow-light);
+            color: #b06000;
+        }
+
+        .status-pending::before {
+            background: var(--yellow);
+        }
+
+        .status-new {
+            background: var(--cyan-light);
+            color: #00838f;
+        }
+
+        .status-new::before {
+            background: var(--cyan);
+        }
+
+        .status-hold {
+            background: var(--orange-light);
+            color: #e65100;
+        }
+
+        .status-hold::before {
+            background: var(--orange);
+        }
+
+        .status-cancel {
+            background: var(--red-light);
+            color: var(--red);
+        }
+
+        .status-cancel::before {
+            background: var(--red);
+        }
+
+        /* Action Buttons */
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1557b0;
+            box-shadow: 0 2px 8px rgba(26, 115, 232, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        /* Priority Tags */
+        .priority-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .priority-high {
+            background: var(--red-light);
+            color: var(--red);
+        }
+
+        .priority-medium {
+            background: var(--yellow-light);
+            color: #b06000;
+        }
+
+        .priority-low {
+            background: var(--green-light);
+            color: var(--green);
+        }
+
+        /* Avatar */
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Bottom Bar */
+        .bottom-bar {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-top: 1px solid var(--border);
+            background: var(--bg-primary);
+            gap: 16px;
+        }
+
+        .stats {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+
+        .page-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .page-btn:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .page-btn.active {
+            background: var(--blue);
+            color: white;
+            border-color: var(--blue);
+        }
+
+        /* Add Row Button */
+        .add-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .add-row:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 18px;
+        }
+
+        .modal-close:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            max-height: calc(90vh - 140px);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+            background: var(--bg-primary);
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px var(--blue-light);
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Top Navigation -->
+        <nav class="top-nav">
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="switchTab(this, 'orders')">
+                    <i class="fas fa-clipboard-list"></i>
+                    工單列表
+                </button>
+                <button class="nav-tab" onclick="switchTab(this, 'schedule')">
+                    <i class="fas fa-calendar-alt"></i>
+                    生產排程
+                </button>
+                <button class="nav-tab" onclick="switchTab(this, 'kanban')">
+                    <i class="fas fa-columns"></i>
+                    看板
+                </button>
+                <button class="nav-tab" onclick="switchTab(this, 'resources')">
+                    <i class="fas fa-cogs"></i>
+                    資源管理
+                </button>
+                <button class="nav-tab" onclick="switchTab(this, 'reports')">
+                    <i class="fas fa-chart-bar"></i>
+                    報表分析
+                </button>
+            </div>
+            <div class="add-tab" onclick="addNewTab()">
+                <i class="fas fa-plus"></i>
+            </div>
+        </nav>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <button class="toolbar-btn" title="新增" onclick="openModal()">
+                <i class="fas fa-plus"></i>
+            </button>
+            <button class="toolbar-btn" title="編輯" onclick="editSelected()">
+                <i class="fas fa-edit"></i>
+            </button>
+            <button class="toolbar-btn" title="刪除" onclick="deleteSelected()">
+                <i class="fas fa-trash"></i>
+            </button>
+            <div class="toolbar-divider"></div>
+            <button class="toolbar-btn" title="篩選">
+                <i class="fas fa-filter"></i>
+            </button>
+            <button class="toolbar-btn" title="排序">
+                <i class="fas fa-sort"></i>
+            </button>
+            <button class="toolbar-btn" title="分組">
+                <i class="fas fa-layer-group"></i>
+            </button>
+            <div class="toolbar-divider"></div>
+            <button class="toolbar-btn" title="匯入">
+                <i class="fas fa-file-import"></i>
+            </button>
+            <button class="toolbar-btn" title="匯出">
+                <i class="fas fa-file-export"></i>
+            </button>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="搜尋工單..." id="searchInput" onkeyup="searchOrders()">
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40px;">
+                            <div class="checkbox" onclick="toggleSelectAll()" id="selectAll"></div>
+                        </th>
+                        <th><i class="fas fa-hashtag"></i>序號</th>
+                        <th><i class="fas fa-file-alt"></i>工單編號</th>
+                        <th><i class="fas fa-box"></i>產品名稱</th>
+                        <th><i class="fas fa-industry"></i>產線</th>
+                        <th><i class="fas fa-flag"></i>狀態</th>
+                        <th><i class="fas fa-exclamation-circle"></i>優先級</th>
+                        <th><i class="fas fa-calendar"></i>開始日期</th>
+                        <th><i class="fas fa-calendar-check"></i>結束日期</th>
+                        <th><i class="fas fa-sort-numeric-up"></i>數量</th>
+                        <th><i class="fas fa-user"></i>負責人</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Data will be inserted by JS -->
+                </tbody>
+            </table>
+
+            <div class="add-row" onclick="openModal()">
+                <i class="fas fa-plus"></i>
+                <span>新增工單</span>
+            </div>
+        </div>
+
+        <!-- Bottom Bar -->
+        <div class="bottom-bar">
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-dot" style="background: var(--green);"></div>
+                    <span>已完成: <strong id="stat-done">0</strong></span>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-dot" style="background: var(--blue);"></div>
+                    <span>進行中: <strong id="stat-progress">0</strong></span>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-dot" style="background: var(--yellow);"></div>
+                    <span>待產: <strong id="stat-pending">0</strong></span>
+                </div>
+                <div class="stat-item">
+                    <span>總計: <strong id="stat-total">0</strong> 筆</span>
+                </div>
+            </div>
+
+            <div class="pagination">
+                <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">新增工單</h3>
+                <button class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="orderForm" class="modal-body">
+                <input type="hidden" id="orderId">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">工單編號</label>
+                        <input type="text" id="orderNo" class="form-input" placeholder="WO-202403-001" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">產品名稱</label>
+                        <input type="text" id="productName" class="form-input" placeholder="產品名稱" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">產線</label>
+                        <select id="productionLine" class="form-select" required>
+                            <option value="">選擇產線</option>
+                            <option value="A線">A線</option>
+                            <option value="B線">B線</option>
+                            <option value="C線">C線</option>
+                            <option value="D線">D線</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">狀態</label>
+                        <select id="status" class="form-select" required>
+                            <option value="pending">待產</option>
+                            <option value="progress">進行中</option>
+                            <option value="done">已完成</option>
+                            <option value="hold">暫停</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">優先級</label>
+                        <select id="priority" class="form-select" required>
+                            <option value="high">高</option>
+                            <option value="medium">中</option>
+                            <option value="low">低</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">數量</label>
+                        <input type="number" id="quantity" class="form-input" placeholder="0" min="1" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">開始日期</label>
+                        <input type="date" id="startDate" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">結束日期</label>
+                        <input type="date" id="endDate" class="form-input" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">負責人</label>
+                    <input type="text" id="assignee" class="form-input" placeholder="負責人姓名">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">備註</label>
+                    <textarea id="note" class="form-textarea" placeholder="備註說明"></textarea>
+                </div>
+            </form>
+
+            <div class="modal-footer">
+                <button class="btn-action btn-secondary" onclick="closeModal()">取消</button>
+                <button class="btn-action btn-primary" onclick="saveOrder()">儲存</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample Data
+        let orders = JSON.parse(localStorage.getItem('crmOrders') || '[]');
+        let selectedRows = new Set();
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            if (orders.length === 0) {
+                orders = [
+                    { id: '1', orderNo: 'WO-202403-001', productName: '精密軸承-A型', productionLine: 'A線', status: 'done', priority: 'high', startDate: '2024-03-20', endDate: '2024-03-24', quantity: 2000, assignee: '張明遠', note: '' },
+                    { id: '2', orderNo: 'WO-202403-002', productName: '齒輪組-B型', productionLine: 'B線', status: 'progress', priority: 'high', startDate: '2024-03-25', endDate: '2024-03-28', quantity: 1500, assignee: '李思涵', note: '優先處理' },
+                    { id: '3', orderNo: 'WO-202403-003', productName: '連接器-C型', productionLine: 'A線', status: 'pending', priority: 'medium', startDate: '2024-03-26', endDate: '2024-03-29', quantity: 3000, assignee: '王建國', note: '' },
+                    { id: '4', orderNo: 'WO-202403-004', productName: '外殼組件-D型', productionLine: 'C線', status: 'hold', priority: 'low', startDate: '2024-03-27', endDate: '2024-03-30', quantity: 800, assignee: '陳雅芳', note: '材料待確認' },
+                    { id: '5', orderNo: 'WO-202403-005', productName: '電路板-E型', productionLine: 'D線', status: 'progress', priority: 'high', startDate: '2024-03-25', endDate: '2024-03-28', quantity: 1200, assignee: '林志豪', note: '' },
+                    { id: '6', orderNo: 'WO-202403-006', productName: '散熱片-F型', productionLine: 'B線', status: 'pending', priority: 'medium', startDate: '2024-03-28', endDate: '2024-04-01', quantity: 2500, assignee: '黃美玲', note: '' },
+                    { id: '7', orderNo: 'WO-202403-007', productName: '傳動軸-G型', productionLine: 'A線', status: 'done', priority: 'low', startDate: '2024-03-18', endDate: '2024-03-22', quantity: 600, assignee: '劉大偉', note: '已完成檢驗' },
+                    { id: '8', orderNo: 'WO-202403-008', productName: '密封圈-H型', productionLine: 'C線', status: 'pending', priority: 'high', startDate: '2024-03-29', endDate: '2024-04-02', quantity: 5000, assignee: '周小婷', note: '急單' }
+                ];
+                localStorage.setItem('crmOrders', JSON.stringify(orders));
+            }
+            renderTable();
+            updateStats();
+        });
+
+        // Render Table
+        function renderTable(data = orders) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            data.forEach((order, index) => {
+                const statusClass = {
+                    done: 'status-done',
+                    progress: 'status-progress',
+                    pending: 'status-pending',
+                    hold: 'status-hold'
+                }[order.status] || 'status-pending';
+
+                const statusText = {
+                    done: '✓ 已完成',
+                    progress: '● 進行中',
+                    pending: '○ 待產',
+                    hold: '◐ 暫停'
+                }[order.status] || '待產';
+
+                const priorityClass = {
+                    high: 'priority-high',
+                    medium: 'priority-medium',
+                    low: 'priority-low'
+                }[order.priority] || 'priority-medium';
+
+                const priorityText = { high: '高', medium: '中', low: '低' }[order.priority] || '中';
+
+                const avatar = order.assignee ? order.assignee.charAt(0) : '?';
+
+                tbody.innerHTML += `
+                    <tr onclick="selectRow('${order.id}', this)">
+                        <td>
+                            <div class="checkbox ${selectedRows.has(order.id) ? 'checked' : ''}" 
+                                 onclick="toggleCheckbox(event, '${order.id}')">
+                                ${selectedRows.has(order.id) ? '<i class="fas fa-check"></i>' : ''}
+                            </div>
+                        </td>
+                        <td class="row-num">${index + 1}</td>
+                        <td><span class="cell-link">${order.orderNo}</span></td>
+                        <td><span class="cell-text">${order.productName}</span></td>
+                        <td><span class="cell-text">${order.productionLine}</span></td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td><span class="priority-tag ${priorityClass}">${priorityText}</span></td>
+                        <td><span class="cell-text">${order.startDate}</span></td>
+                        <td><span class="cell-text">${order.endDate}</span></td>
+                        <td><span class="cell-text">${order.quantity.toLocaleString()}</span></td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="avatar">${avatar}</div>
+                                <span>${order.assignee || '-'}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <button class="btn-action btn-primary" onclick="editOrder(event, '${order.id}')">
+                                編輯
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Selection
+        function toggleCheckbox(event, id) {
+            event.stopPropagation();
+            if (selectedRows.has(id)) {
+                selectedRows.delete(id);
+            } else {
+                selectedRows.add(id);
+            }
+            renderTable();
+        }
+
+        function selectRow(id, row) {
+            document.querySelectorAll('.data-table tr').forEach(r => r.classList.remove('selected'));
+            row.classList.add('selected');
+        }
+
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            if (selectedRows.size === orders.length) {
+                selectedRows.clear();
+                selectAll.classList.remove('checked');
+                selectAll.innerHTML = '';
+            } else {
+                orders.forEach(o => selectedRows.add(o.id));
+                selectAll.classList.add('checked');
+                selectAll.innerHTML = '<i class="fas fa-check"></i>';
+            }
+            renderTable();
+        }
+
+        // Stats
+        function updateStats() {
+            document.getElementById('stat-done').textContent = orders.filter(o => o.status === 'done').length;
+            document.getElementById('stat-progress').textContent = orders.filter(o => o.status === 'progress').length;
+            document.getElementById('stat-pending').textContent = orders.filter(o => o.status === 'pending').length;
+            document.getElementById('stat-total').textContent = orders.length;
+        }
+
+        // Search
+        function searchOrders() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = orders.filter(o => 
+                o.orderNo.toLowerCase().includes(query) ||
+                o.productName.toLowerCase().includes(query) ||
+                o.assignee.toLowerCase().includes(query)
+            );
+            renderTable(filtered);
+        }
+
+        // Tab Switching
+        function switchTab(tab, view) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            // View switching logic would go here
+        }
+
+        function addNewTab() {
+            const name = prompt('輸入新分頁名稱:');
+            if (name) {
+                // Add new tab logic
+            }
+        }
+
+        // Modal
+        function openModal() {
+            document.getElementById('modal').classList.add('active');
+            document.getElementById('orderForm').reset();
+            document.getElementById('orderId').value = '';
+            document.getElementById('modal-title').textContent = '新增工單';
+            document.getElementById('startDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('endDate').value = new Date().toISOString().split('T')[0];
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        function saveOrder() {
+            const form = document.getElementById('orderForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const orderData = {
+                id: document.getElementById('orderId').value || Date.now().toString(),
+                orderNo: document.getElementById('orderNo').value,
+                productName: document.getElementById('productName').value,
+                productionLine: document.getElementById('productionLine').value,
+                status: document.getElementById('status').value,
+                priority: document.getElementById('priority').value,
+                quantity: parseInt(document.getElementById('quantity').value),
+                startDate: document.getElementById('startDate').value,
+                endDate: document.getElementById('endDate').value,
+                assignee: document.getElementById('assignee').value,
+                note: document.getElementById('note').value
+            };
+
+            const existingIndex = orders.findIndex(o => o.id === orderData.id);
+            if (existingIndex >= 0) {
+                orders[existingIndex] = orderData;
+            } else {
+                orders.push(orderData);
+            }
+
+            localStorage.setItem('crmOrders', JSON.stringify(orders));
+            closeModal();
+            renderTable();
+            updateStats();
+        }
+
+        function editOrder(event, id) {
+            event.stopPropagation();
+            const order = orders.find(o => o.id === id);
+            if (!order) return;
+
+            document.getElementById('modal').classList.add('active');
+            document.getElementById('orderId').value = order.id;
+            document.getElementById('orderNo').value = order.orderNo;
+            document.getElementById('productName').value = order.productName;
+            document.getElementById('productionLine').value = order.productionLine;
+            document.getElementById('status').value = order.status;
+            document.getElementById('priority').value = order.priority;
+            document.getElementById('quantity').value = order.quantity;
+            document.getElementById('startDate').value = order.startDate;
+            document.getElementById('endDate').value = order.endDate;
+            document.getElementById('assignee').value = order.assignee;
+            document.getElementById('note').value = order.note || '';
+            document.getElementById('modal-title').textContent = '編輯工單';
+        }
+
+        function editSelected() {
+            if (selectedRows.size !== 1) {
+                alert('請選擇一個工單進行編輯');
+                return;
+            }
+            const id = Array.from(selectedRows)[0];
+            editOrder({ stopPropagation: () => {} }, id);
+        }
+
+        function deleteSelected() {
+            if (selectedRows.size === 0) {
+                alert('請選擇要刪除的工單');
+                return;
+            }
+            if (!confirm(`確定要刪除 ${selectedRows.size} 筆工單嗎？`)) return;
+
+            orders = orders.filter(o => !selectedRows.has(o.id));
+            selectedRows.clear();
+            localStorage.setItem('crmOrders', JSON.stringify(orders));
+            renderTable();
+            updateStats();
+        }
+
+        // Close modal on overlay click
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+    </script>
+</body>
+</html>
