@@ -6,93 +6,6 @@
     <title>生產排程管理系統</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-    <script>
-        // Supabase 設定
-        const SUPABASE_URL = 'https://rbtkdhmpaiufirvkexwn.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJidGtkaG1wYWl1ZmlydmtleHduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NTIxOTQsImV4cCI6MjA5MDQyODE5NH0.T-M79J0-gNoKZF2XLoGuFDHn41VDL46XMyDk99ucZmw';
-        
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        
-        // 全域資料
-        let projects = [];
-        let customers = [];
-        let vendors = [];
-        
-        // 從 Supabase 載入資料
-        async function loadData() {
-            try {
-                // 載入客戶資料
-                const { data: customersData, error: customersError } = await supabase
-                    .from('customers')
-                    .select('*');
-                if (!customersError) customers = customersData || [];
-                
-                // 載入廠商資料
-                const { data: vendorsData, error: vendorsError } = await supabase
-                    .from('vendors')
-                    .select('*');
-                if (!vendorsError) vendors = vendorsData || [];
-                
-                // 載入專案資料（包含關聯資料）
-                const { data: projectsData, error: projectsError } = await supabase
-                    .from('orders')
-                    .select(`
-                        *,
-                        customers(name, contact_person),
-                        vendors(name),
-                        products(name, specification)
-                    `)
-                    .order('created_at', { ascending: false });
-                
-                if (projectsError) throw projectsError;
-                
-                // 轉換資料格式
-                projects = (projectsData || []).map(order => ({
-                    id: order.order_no,
-                    name: order.products?.name || '未命名產品',
-                    client: order.customers?.name || '未知客戶',
-                    contact: order.customers?.contact_person || '',
-                    status: mapStatus(order.customer_status),
-                    statusText: order.customer_status,
-                    progress: order.customer_progress || 0,
-                    startDate: order.created_at ? order.created_at.split('T')[0] : '',
-                    totalQuantity: order.quantity || 0,
-                    deliveryDate: order.deadline || '',
-                    vendorName: order.vendors?.name || '',
-                    vendorStatus: order.vendor_status || '',
-                    vendorProgress: order.vendor_progress || 0,
-                    notes: order.notes || '',
-                    orders: []
-                }));
-                
-                renderProjects();
-                
-            } catch (error) {
-                console.error('載入資料失敗:', error);
-                document.getElementById('projectsGrid').innerHTML = 
-                    '<div style="text-align:center;padding:60px;color:#c53030;">載入資料失敗: ' + error.message + '</div>';
-            }
-        }
-        
-        // 狀態對應
-        function mapStatus(status) {
-            const map = {
-                '待確認': 'proposal',
-                '已確認': 'quote',
-                '生產中': 'production',
-                '待出貨': 'shipping',
-                '已出貨': 'shipping',
-                '已完成': 'done'
-            };
-            return map[status] || 'proposal';
-        }
-        
-        // 頁面載入時初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            loadData();
-        });
-    </script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -450,11 +363,25 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script>
+        // Supabase 設定
+        const SUPABASE_URL = 'https://rbtkdhmpaiufirvkexwn.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJidGtkaG1wYWl1ZmlydmtleHduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NTIxOTQsImV4cCI6MjA5MDQyODE5NH0.T-M79J0-gNoKZF2XLoGuFDHn41VDL46XMyDk99ucZmw';
+        
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // 全域資料
+        let projects = [];
+        let customers = [];
+        let vendors = [];
+        
         // Helper function to get day of week
         function getDayOfWeek(dateStr) {
+            if (!dateStr) return '-';
             const days = ['日', '一', '二', '三', '四', '五', '六'];
             const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return '-';
             return '星期' + days[date.getDay()];
         }
 
@@ -466,7 +393,7 @@
                 return;
             }
             grid.innerHTML = projects.map(project => {
-                const deliveryDay = project.deliveryDate ? getDayOfWeek(project.deliveryDate) : '-';
+                const deliveryDay = getDayOfWeek(project.deliveryDate);
                 return `
                 <div class="project-card" onclick="openProject('${project.id}')">
                     <div class="card-header">
@@ -502,6 +429,95 @@
             `}).join('');
         }
 
+        // 從 Supabase 載入資料
+        async function loadData() {
+            try {
+                console.log('開始載入資料...');
+                
+                // 載入客戶資料
+                const { data: customersData, error: customersError } = await supabaseClient
+                    .from('customers')
+                    .select('*');
+                if (customersError) console.error('客戶資料錯誤:', customersError);
+                else customers = customersData || [];
+                console.log('客戶資料:', customers.length, '筆');
+                
+                // 載入廠商資料
+                const { data: vendorsData, error: vendorsError } = await supabaseClient
+                    .from('vendors')
+                    .select('*');
+                if (vendorsError) console.error('廠商資料錯誤:', vendorsError);
+                else vendors = vendorsData || [];
+                console.log('廠商資料:', vendors.length, '筆');
+                
+                // 載入訂單資料（簡化查詢，不使用關聯）
+                const { data: ordersData, error: ordersError } = await supabaseClient
+                    .from('orders')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (ordersError) {
+                    console.error('訂單資料錯誤:', ordersError);
+                    throw ordersError;
+                }
+                
+                console.log('訂單資料:', ordersData ? ordersData.length : 0, '筆');
+                
+                // 載入產品資料
+                const { data: productsData, error: productsError } = await supabaseClient
+                    .from('products')
+                    .select('*');
+                if (productsError) console.error('產品資料錯誤:', productsError);
+                const products = productsData || [];
+                console.log('產品資料:', products.length, '筆');
+                
+                // 轉換資料格式
+                projects = (ordersData || []).map(order => {
+                    const customer = customers.find(c => c.id === order.customer_id);
+                    const product = products.find(p => p.id === order.product_id);
+                    const vendor = vendors.find(v => v.id === order.vendor_id);
+                    
+                    return {
+                        id: order.order_no,
+                        name: product ? product.name : '未命名產品',
+                        client: customer ? customer.name : '未知客戶',
+                        contact: customer ? customer.contact_person : '',
+                        status: mapStatus(order.customer_status),
+                        statusText: order.customer_status,
+                        progress: order.customer_progress || 0,
+                        startDate: order.created_at ? order.created_at.split('T')[0] : '',
+                        totalQuantity: order.quantity || 0,
+                        deliveryDate: order.deadline || '',
+                        vendorName: vendor ? vendor.name : '',
+                        vendorStatus: order.vendor_status || '',
+                        vendorProgress: order.vendor_progress || 0,
+                        notes: order.notes || ''
+                    };
+                });
+                
+                console.log('轉換後專案:', projects.length, '筆');
+                renderProjects();
+                
+            } catch (error) {
+                console.error('載入資料失敗:', error);
+                document.getElementById('projectsGrid').innerHTML = 
+                    '<div style="text-align:center;padding:60px;color:#c53030;">載入資料失敗: ' + error.message + '</div>';
+            }
+        }
+        
+        // 狀態對應
+        function mapStatus(status) {
+            const map = {
+                '待確認': 'proposal',
+                '已確認': 'quote',
+                '生產中': 'production',
+                '待出貨': 'shipping',
+                '已出貨': 'shipping',
+                '已完成': 'done'
+            };
+            return map[status] || 'proposal';
+        }
+
         function openProject(id) {
             alert('查看專案: ' + id);
         }
@@ -513,6 +529,12 @@
         function openNewProjectModal() {
             alert('新增專案功能');
         }
+        
+        // 頁面載入時初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM 已載入，開始載入資料...');
+            loadData();
+        });
     </script>
 </body>
 </html>
