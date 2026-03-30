@@ -10,7 +10,7 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --primary: #6366f1; --primary-dark: #4f46e5; --success: #22c55e; --warning: #f59e0b;
+            --primary: #6366f1; --primary-dark: #4f46e5; --success: #22c55e; --warning: #f59e0b; --danger: #ef4444;
             --bg: #f8fafc; --bg-card: #ffffff; --text: #1e293b; --text-secondary: #64748b; --border: #e2e8f0;
         }
         body {
@@ -22,7 +22,7 @@
             padding: 20px 24px; box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
         }
         .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-        .logo { display: flex; align-items: center; gap: 12px; color: white; }
+        .logo { display: flex; align-items: center; gap: 12px; color: white; cursor: pointer; }
         .logo-icon { width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
         .logo-text { font-size: 20px; font-weight: 700; }
         .last-update { font-size: 12px; color: rgba(255,255,255,0.8); margin-left: 12px; }
@@ -30,12 +30,9 @@
         .btn-header { padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
         .btn-header.secondary { background: rgba(255,255,255,0.2); color: white; }
         .btn-header.primary { background: #22c55e; color: white; }
-        .search-bar { display: flex; align-items: center; gap: 12px; }
-        .search-input { flex: 1; padding: 12px 16px; background: white; border: none; border-radius: 10px; font-size: 14px; display: flex; align-items: center; gap: 12px; }
-        .search-input input { border: none; outline: none; font-size: 14px; width: 100%; }
-        .btn-search { padding: 12px 24px; background: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--primary); cursor: pointer; }
-        .btn-clear { padding: 12px 20px; background: rgba(255,255,255,0.2); border: none; border-radius: 10px; font-size: 14px; font-weight: 600; color: white; cursor: pointer; }
         .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+        
+        /* 專案卡片樣式 */
         .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 20px; }
         .project-card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid var(--border); cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; }
         .project-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--warning); }
@@ -55,36 +52,77 @@
         .btn-edit-card { width: 32px; height: 32px; border: none; background: #f1f5f9; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); transition: all 0.2s; }
         .btn-edit-card:hover { background: var(--primary); color: white; }
         
+        /* 工單列表頁面 */
+        .workorder-view { display: none; }
+        .workorder-view.active { display: block; }
+        .back-btn { display: inline-flex; align-items: center; gap: 8px; color: white; font-size: 14px; cursor: pointer; margin-bottom: 16px; }
+        .project-title { color: white; font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+        .project-subtitle { color: rgba(255,255,255,0.8); font-size: 14px; }
+        
+        /* 表格樣式 */
+        .table-container { background: white; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); overflow: hidden; }
+        .table-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--border); }
+        .table-title { font-size: 18px; font-weight: 700; }
+        .btn-add { padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .btn-add:hover { background: var(--primary-dark); }
+        
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f8fafc; padding: 14px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid var(--border); white-space: nowrap; }
+        td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 14px; }
+        tr:hover { background: #f8fafc; }
+        
+        /* 狀態標籤 */
+        .badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .badge-yellow { background: #fef3c7; color: #92400e; }
+        .badge-green { background: #d1fae5; color: #065f46; }
+        .badge-red { background: #fee2e2; color: #991b1b; }
+        .badge-blue { background: #dbeafe; color: #1e40af; }
+        .badge-gray { background: #f3f4f6; color: #4b5563; }
+        
+        /* 優先級 */
+        .priority { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; font-size: 12px; font-weight: 700; }
+        .priority-high { background: #fee2e2; color: #dc2626; }
+        .priority-medium { background: #fef3c7; color: #d97706; }
+        .priority-low { background: #d1fae5; color: #059669; }
+        
+        /* 負責人頭像 */
+        .avatar { display: inline-flex; align-items: center; gap: 8px; }
+        .avatar-img { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; }
+        .avatar-name { font-size: 14px; color: var(--text); }
+        
+        /* 操作按鈕 */
+        .btn-action { padding: 8px 16px; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-edit { background: var(--primary); color: white; }
+        .btn-edit:hover { background: var(--primary-dark); }
+        
+        /* Checkbox */
+        .checkbox { width: 18px; height: 18px; border: 2px solid var(--border); border-radius: 4px; cursor: pointer; }
+        
         /* Modal Styles */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
         .modal-overlay.active { display: flex; }
         .modal { background: white; border-radius: 16px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
         .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--border); }
         .modal-title { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-        .modal-title i { color: var(--warning); }
         .btn-close { width: 32px; height: 32px; border: none; background: #f1f5f9; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); }
-        .btn-close:hover { background: var(--danger); color: white; }
         .modal-body { padding: 24px; }
         .form-group { margin-bottom: 20px; }
         .form-label { display: block; font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
-        .form-input { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; transition: all 0.2s; }
-        .form-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+        .form-input { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; }
+        .form-input:focus { outline: none; border-color: var(--primary); }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         .modal-footer { display: flex; gap: 12px; padding: 20px 24px; border-top: 1px solid var(--border); }
-        .btn-cancel { flex: 1; padding: 12px 24px; border: 1px solid var(--border); background: white; border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer; }
-        .btn-cancel:hover { background: var(--bg); }
-        .btn-save { flex: 1; padding: 12px 24px; border: none; background: var(--primary); border-radius: 10px; font-size: 14px; font-weight: 600; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-save:hover { background: var(--primary-dark); }
-        .btn-save:disabled { background: #ccc; cursor: not-allowed; }
+        .btn-cancel { flex: 1; padding: 12px 24px; border: 1px solid var(--border); background: white; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .btn-save { flex: 1; padding: 12px 24px; border: none; background: var(--primary); border-radius: 10px; font-size: 14px; font-weight: 600; color: white; cursor: pointer; }
         
         /* Status message */
-        .status-msg { position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; z-index: 2000; animation: slideIn 0.3s ease; }
+        .status-msg { position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; z-index: 2000; }
         .status-msg.success { background: #22c55e; color: white; }
         .status-msg.error { background: #ef4444; color: white; }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     </style>
 </head>
 <body>
+    <!-- 主畫面 - 專案卡片列表 -->
     <div id="mainView">
         <header class="header">
             <div class="header-top">
@@ -98,13 +136,6 @@
                     <button class="btn-header primary" onclick="alert('新增專案')"><i class="fas fa-plus"></i>新增專案</button>
                 </div>
             </div>
-            <div class="search-bar">
-                <div class="search-input"><i class="fas fa-search"></i><input type="text" placeholder="搜尋客戶、產品或聯絡人..."></div>
-                <div class="search-input"><i class="fas fa-filter"></i><input type="text" placeholder="進一步篩選..."></div>
-                <button class="btn-search"><i class="fas fa-search"></i>搜尋</button>
-                <button class="btn-clear">清除</button>
-                <button class="btn-header secondary"><i class="fas fa-users"></i>人員查詢</button>
-            </div>
         </header>
 
         <div class="container">
@@ -114,59 +145,48 @@
         </div>
     </div>
 
-    <!-- Edit Modal -->
-    <div class="modal-overlay" id="editModal">
-        <div class="modal">
-            <div class="modal-header">
-                <div class="modal-title">
-                    <i class="fas fa-pencil-alt"></i>
-                    編輯專案
+    <!-- 工單列表頁面 -->
+    <div id="workorderView" class="workorder-view">
+        <header class="header">
+            <div class="container" style="padding: 20px 24px;">
+                <div class="back-btn" onclick="backToProjects()">
+                    <i class="fas fa-arrow-left"></i> 返回專案列表
                 </div>
-                <button class="btn-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+                <div class="project-title" id="woProjectTitle">專案名稱</div>
+                <div class="project-subtitle" id="woProjectInfo">客戶名稱 / 聯絡人</div>
             </div>
-            <div class="modal-body">
-                <input type="hidden" id="editId">
-                <input type="hidden" id="editOrderId">
-                
-                <div class="form-group">
-                    <label class="form-label">案名</label>
-                    <input type="text" class="form-input" id="editName" placeholder="輸入案名">
+        </header>
+
+        <div class="container">
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-title"><i class="fas fa-list"></i> 工單列表</div>
+                    <button class="btn-add" onclick="addWorkorder()">
+                        <i class="fas fa-plus"></i> 新增工單
+                    </button>
                 </div>
                 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">聯絡人公司</label>
-                        <input type="text" class="form-input" id="editClient" placeholder="輸入公司名稱">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">聯絡人姓名</label>
-                        <input type="text" class="form-input" id="editContact" placeholder="輸入聯絡人姓名">
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">開始日期</label>
-                        <input type="date" class="form-input" id="editStartDate">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">交期</label>
-                        <input type="date" class="form-input" id="editDeliveryDate">
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">數量</label>
-                    <input type="number" class="form-input" id="editQuantity" placeholder="輸入數量">
-                </div>
-            </div>
-            
-            <div class="modal-footer">
-                <button class="btn-cancel" onclick="closeModal()">取消</button>
-                <button class="btn-save" id="saveBtn" onclick="saveEdit()">
-                    <i class="fas fa-check"></i>
-                    更新
-                </button>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;"><input type="checkbox" class="checkbox"></th>
+                            <th>序號</th>
+                            <th>工單編號</th>
+                            <th>產品名稱</th>
+                            <th>產線</th>
+                            <th>狀態</th>
+                            <th>優先級</th>
+                            <th>開始日期</th>
+                            <th>結束日期</th>
+                            <th>數量</th>
+                            <th>負責人</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="workorderTableBody">
+                        <!-- 工單資料會動態載入 -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -178,20 +198,21 @@
         
         let supabaseClient = null;
         let projects = [];
-        let customers = [];
-        let products = [];
+        let currentProject = null;
 
-        // 初始化 Supabase
+        // 測試工單資料
+        let workorders = [
+            { id: 1, woNo: 'WO-202403-001', product: '20寸行李箱外殼', line: 'A線', status: '待產', priority: 'high', startDate: '2024-03-20', endDate: '2024-03-24', quantity: 2000, owner: '李明達' },
+            { id: 2, woNo: 'WO-202403-002', product: '28寸行李箱外殼', line: 'B線', status: '待產', priority: 'high', startDate: '2024-03-25', endDate: '2024-03-28', quantity: 1500, owner: '李思涵' },
+            { id: 3, woNo: 'WO-202403-003', product: 'Logo印刷-熱轉印', line: 'C線', status: '待產', priority: 'medium', startDate: '2024-03-26', endDate: '2024-03-29', quantity: 3500, owner: '王建國' }
+        ];
+
         function initSupabase() {
-            if (typeof supabase === 'undefined') {
-                showStatus('Supabase 函式庫未載入', 'error');
-                return false;
-            }
+            if (typeof supabase === 'undefined') return false;
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
             return true;
         }
 
-        // 顯示狀態訊息
         function showStatus(msg, type) {
             const div = document.createElement('div');
             div.className = 'status-msg ' + type;
@@ -200,30 +221,24 @@
             setTimeout(() => div.remove(), 3000);
         }
 
-        // 從 Supabase 載入資料
         async function loadFromSupabase() {
             if (!supabaseClient) {
-                if (!initSupabase()) return;
+                if (!initSupabase()) {
+                    // 使用測試資料
+                    projects = [
+                        { id: 'A0010-260317', name: '20寸/28寸行李箱+logo印刷', client: '高柏科技', contact: 'Joanne', progress: 30, startDate: '2026-03-30', totalQuantity: 7000, deliveryDate: '2025-04-15' },
+                        { id: 'A0011-260318', name: '鋁合金手機支架', client: '創新科技', contact: 'Alex', progress: 25, startDate: '2026-03-30', totalQuantity: 5000, deliveryDate: '2025-04-10' },
+                        { id: 'A0012-260319', name: 'USB-C 充電線組', client: '數位生活', contact: '小陳', progress: 60, startDate: '2026-03-30', totalQuantity: 20000, deliveryDate: '2025-04-20' }
+                    ];
+                    renderProjects();
+                    updateLastModifiedTime();
+                    return;
+                }
             }
             
             try {
                 document.getElementById('projectsGrid').innerHTML = '<div style="text-align:center;padding:60px;color:#666;"><i class="fas fa-spinner fa-spin"></i> 載入中...</div>';
                 
-                // 載入客戶資料
-                const { data: customersData, error: customersError } = await supabaseClient
-                    .from('customers')
-                    .select('*');
-                if (customersError) throw customersError;
-                customers = customersData || [];
-                
-                // 載入產品資料
-                const { data: productsData, error: productsError } = await supabaseClient
-                    .from('products')
-                    .select('*');
-                if (productsError) throw productsError;
-                products = productsData || [];
-                
-                // 載入訂單資料
                 const { data: ordersData, error: ordersError } = await supabaseClient
                     .from('orders')
                     .select('*')
@@ -231,35 +246,31 @@
                 
                 if (ordersError) throw ordersError;
                 
-                // 轉換資料格式
-                projects = (ordersData || []).map(order => {
-                    const customer = customers.find(c => c.id === order.customer_id);
-                    const product = products.find(p => p.id === order.product_id);
-                    
-                    return {
-                        orderId: order.id,
-                        id: order.order_no,
-                        name: product ? product.name : '未命名產品',
-                        client: customer ? customer.name : '未知客戶',
-                        contact: customer ? customer.contact_person : '',
-                        customerId: order.customer_id,
-                        productId: order.product_id,
-                        status: order.customer_status,
-                        progress: order.customer_progress || 0,
-                        startDate: order.created_at ? order.created_at.split('T')[0] : '',
-                        totalQuantity: order.quantity || 0,
-                        deliveryDate: order.deadline || '',
-                        notes: order.notes || ''
-                    };
-                });
+                projects = (ordersData || []).map(order => ({
+                    orderId: order.id,
+                    id: order.order_no,
+                    name: order.product_name || '未命名產品',
+                    client: order.customer_name || '未知客戶',
+                    contact: order.contact_person || '',
+                    progress: order.customer_progress || 0,
+                    startDate: order.created_at ? order.created_at.split('T')[0] : '',
+                    totalQuantity: order.quantity || 0,
+                    deliveryDate: order.deadline || ''
+                }));
                 
                 renderProjects();
                 updateLastModifiedTime();
                 
             } catch (error) {
                 console.error('載入資料失敗:', error);
-                document.getElementById('projectsGrid').innerHTML = 
-                    '<div style="text-align:center;padding:60px;color:#c53030;">載入失敗: ' + error.message + '</div>';
+                // 使用測試資料
+                projects = [
+                    { id: 'A0010-260317', name: '20寸/28寸行李箱+logo印刷', client: '高柏科技', contact: 'Joanne', progress: 30, startDate: '2026-03-30', totalQuantity: 7000, deliveryDate: '2025-04-15' },
+                    { id: 'A0011-260318', name: '鋁合金手機支架', client: '創新科技', contact: 'Alex', progress: 25, startDate: '2026-03-30', totalQuantity: 5000, deliveryDate: '2025-04-10' },
+                    { id: 'A0012-260319', name: 'USB-C 充電線組', client: '數位生活', contact: '小陳', progress: 60, startDate: '2026-03-30', totalQuantity: 20000, deliveryDate: '2025-04-20' }
+                ];
+                renderProjects();
+                updateLastModifiedTime();
             }
         }
 
@@ -314,104 +325,100 @@
             `}).join('');
         }
 
+        // 點擊專案卡片 - 進入工單列表
         function viewProject(id) {
-            console.log('查看專案:', id);
+            currentProject = projects.find(p => p.id === id);
+            if (!currentProject) return;
+            
+            // 更新工單頁面標題
+            document.getElementById('woProjectTitle').textContent = currentProject.name;
+            document.getElementById('woProjectInfo').textContent = `${currentProject.client} / ${currentProject.contact}`;
+            
+            // 渲染工單表格
+            renderWorkorders();
+            
+            // 切換到工單頁面
+            document.getElementById('mainView').style.display = 'none';
+            document.getElementById('workorderView').classList.add('active');
+        }
+
+        // 返回專案列表
+        function backToProjects() {
+            document.getElementById('workorderView').classList.remove('active');
+            document.getElementById('mainView').style.display = 'block';
+            currentProject = null;
+        }
+
+        // 渲染工單表格
+        function renderWorkorders() {
+            const tbody = document.getElementById('workorderTableBody');
+            
+            tbody.innerHTML = workorders.map((wo, index) => {
+                const statusBadge = getStatusBadge(wo.status);
+                const priorityBadge = getPriorityBadge(wo.priority);
+                const avatarInitial = wo.owner ? wo.owner.charAt(0) : '?';
+                
+                return `
+                <tr>
+                    <td><input type="checkbox" class="checkbox"></td>
+                    <td>${index + 1}</td>
+                    <td><strong>${wo.woNo}</strong></td>
+                    <td>${wo.product}</td>
+                    <td>${wo.line}</td>
+                    <td>${statusBadge}</td>
+                    <td>${priorityBadge}</td>
+                    <td>${wo.startDate}</td>
+                    <td>${wo.endDate}</td>
+                    <td>${wo.quantity.toLocaleString()}</td>
+                    <td>
+                        <div class="avatar">
+                            <div class="avatar-img">${avatarInitial}</div>
+                            <span class="avatar-name">${wo.owner}</span>
+                        </div>
+                    </td>
+                    <td><button class="btn-action btn-edit">編輯</button></td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        // 取得狀態標籤
+        function getStatusBadge(status) {
+            const statusMap = {
+                '待產': '<span class="badge badge-yellow"><i class="fas fa-clock"></i> 待產</span>',
+                '生產中': '<span class="badge badge-blue"><i class="fas fa-spinner"></i> 生產中</span>',
+                '已完成': '<span class="badge badge-green"><i class="fas fa-check"></i> 已完成</span>',
+                '已暫停': '<span class="badge badge-gray"><i class="fas fa-pause"></i> 已暫停</span>'
+            };
+            return statusMap[status] || `<span class="badge badge-gray">${status}</span>`;
+        }
+
+        // 取得優先級標籤
+        function getPriorityBadge(priority) {
+            const priorityMap = {
+                'high': '<span class="priority priority-high">高</span>',
+                'medium': '<span class="priority priority-medium">中</span>',
+                'low': '<span class="priority priority-low">低</span>'
+            };
+            return priorityMap[priority] || priority;
+        }
+
+        // 新增工單
+        function addWorkorder() {
+            alert('新增工單功能開發中...');
         }
 
         // 開啟編輯視窗
         function openEditModal(id) {
-            const project = projects.find(p => p.id === id);
-            if (!project) return;
-            
-            document.getElementById('editId').value = id;
-            document.getElementById('editOrderId').value = project.orderId;
-            document.getElementById('editName').value = project.name;
-            document.getElementById('editClient').value = project.client;
-            document.getElementById('editContact').value = project.contact;
-            document.getElementById('editStartDate').value = project.startDate;
-            document.getElementById('editDeliveryDate').value = project.deliveryDate;
-            document.getElementById('editQuantity').value = project.totalQuantity;
-            
-            document.getElementById('editModal').classList.add('active');
-        }
-
-        // 關閉編輯視窗
-        function closeModal() {
-            document.getElementById('editModal').classList.remove('active');
-        }
-
-        // 儲存編輯到 Supabase
-        async function saveEdit() {
-            const orderId = document.getElementById('editOrderId').value;
-            const project = projects.find(p => p.orderId === orderId);
-            if (!project) return;
-            
-            const saveBtn = document.getElementById('saveBtn');
-            saveBtn.disabled = true;
-            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 儲存中...';
-            
-            try {
-                // 更新 customers 表
-                if (project.customerId) {
-                    const { error: customerError } = await supabaseClient
-                        .from('customers')
-                        .update({ 
-                            name: document.getElementById('editClient').value,
-                            contact_person: document.getElementById('editContact').value
-                        })
-                        .eq('id', project.customerId);
-                    
-                    if (customerError) throw customerError;
-                }
-                
-                // 更新 products 表
-                if (project.productId) {
-                    const { error: productError } = await supabaseClient
-                        .from('products')
-                        .update({ name: document.getElementById('editName').value })
-                        .eq('id', project.productId);
-                    
-                    if (productError) throw productError;
-                }
-                
-                // 更新 orders 表
-                const { error: orderError } = await supabaseClient
-                    .from('orders')
-                    .update({
-                        quantity: parseInt(document.getElementById('editQuantity').value) || 0,
-                        deadline: document.getElementById('editDeliveryDate').value,
-                        updated_at: new Date().toISOString()
-                    })
-                    .eq('id', orderId);
-                
-                if (orderError) throw orderError;
-                
-                // 更新本地資料
-                project.name = document.getElementById('editName').value;
-                project.client = document.getElementById('editClient').value;
-                project.contact = document.getElementById('editContact').value;
-                project.startDate = document.getElementById('editStartDate').value;
-                project.deliveryDate = document.getElementById('editDeliveryDate').value;
-                project.totalQuantity = parseInt(document.getElementById('editQuantity').value) || 0;
-                
-                renderProjects();
-                closeModal();
-                updateLastModifiedTime();
-                showStatus('資料已儲存到資料庫', 'success');
-                
-            } catch (error) {
-                console.error('儲存失敗:', error);
-                showStatus('儲存失敗: ' + error.message, 'error');
-            } finally {
-                saveBtn.disabled = false;
-                saveBtn.innerHTML = '<i class="fas fa-check"></i> 更新';
-            }
+            event.stopPropagation();
+            alert('編輯專案功能');
         }
 
         // 更新最後更新時間
         function updateLastModifiedTime() {
             const now = new Date();
-            const timeStr = now.toLocaleString('zh-TW', { hour12: false,
+            const timeStr = now.toLocaleString('zh-TW', { 
+                hour12: false,
                 year: 'numeric', 
                 month: '2-digit', 
                 day: '2-digit', 
@@ -423,11 +430,6 @@
                 timeEl.textContent = '最後更新: ' + timeStr;
             }
         }
-
-        // 點擊 modal 外部關閉
-        document.getElementById('editModal').addEventListener('click', function(e) {
-            if (e.target === this) closeModal();
-        });
 
         // 頁面載入時初始化
         document.addEventListener('DOMContentLoaded', function() {
