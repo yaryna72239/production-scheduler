@@ -9,9 +9,8 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --primary: #6366f1; --success: #22c55e; --warning: #f59e0b;
-            --bg: #f8fafc; --bg-card: #ffffff; --text: #1e293b;
-            --text-secondary: #64748b; --border: #e2e8f0;
+            --primary: #6366f1; --primary-dark: #4f46e5; --success: #22c55e; --warning: #f59e0b;
+            --bg: #f8fafc; --bg-card: #ffffff; --text: #1e293b; --text-secondary: #64748b; --border: #e2e8f0;
         }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -21,48 +20,23 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 20px 24px; box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
         }
-        .header-top {
-            display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;
-        }
+        .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
         .logo { display: flex; align-items: center; gap: 12px; color: white; }
-        .logo-icon {
-            width: 40px; height: 40px; background: rgba(255,255,255,0.2);
-            border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px;
-        }
+        .logo-icon { width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
         .logo-text { font-size: 20px; font-weight: 700; }
         .header-actions { display: flex; align-items: center; gap: 12px; }
-        .btn-header {
-            padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
-            cursor: pointer; border: none; transition: all 0.3s; display: flex; align-items: center; gap: 8px;
-        }
+        .btn-header { padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
         .btn-header.secondary { background: rgba(255,255,255,0.2); color: white; }
         .btn-header.primary { background: #22c55e; color: white; }
         .search-bar { display: flex; align-items: center; gap: 12px; }
-        .search-input {
-            flex: 1; padding: 12px 16px; background: white; border: none;
-            border-radius: 10px; font-size: 14px; display: flex; align-items: center; gap: 12px;
-        }
+        .search-input { flex: 1; padding: 12px 16px; background: white; border: none; border-radius: 10px; font-size: 14px; display: flex; align-items: center; gap: 12px; }
         .search-input input { border: none; outline: none; font-size: 14px; width: 100%; }
-        .btn-search {
-            padding: 12px 24px; background: white; border: none; border-radius: 10px;
-            font-size: 14px; font-weight: 600; color: var(--primary); cursor: pointer;
-        }
-        .btn-clear {
-            padding: 12px 20px; background: rgba(255,255,255,0.2); border: none;
-            border-radius: 10px; font-size: 14px; font-weight: 600; color: white; cursor: pointer;
-        }
+        .btn-search { padding: 12px 24px; background: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--primary); cursor: pointer; }
+        .btn-clear { padding: 12px 20px; background: rgba(255,255,255,0.2); border: none; border-radius: 10px; font-size: 14px; font-weight: 600; color: white; cursor: pointer; }
         .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
-        .projects-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 20px;
-        }
-        .project-card {
-            background: white; border-radius: 16px; padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid var(--border);
-            cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden;
-        }
-        .project-card::before {
-            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--warning);
-        }
+        .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 20px; }
+        .project-card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid var(--border); cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; }
+        .project-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--warning); }
         .project-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.1); }
         .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
         .project-id { font-size: 12px; color: var(--text-secondary); font-family: monospace; }
@@ -76,10 +50,29 @@
         .progress-bar { height: 6px; background: var(--border); border-radius: 3px; margin-bottom: 8px; overflow: hidden; }
         .progress-fill { height: 100%; background: linear-gradient(90deg, var(--success), #4ade80); border-radius: 3px; transition: width 0.5s; }
         .progress-text { text-align: right; font-size: 12px; color: var(--text-secondary); }
-        .loading { text-align: center; padding: 60px; color: #666; }
-        .error-box { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 16px; margin: 20px; color: #dc2626; }
-        .btn-edit-card { width: 32px; height: 32px; border: none; background: #f1f5f9; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); }
+        .btn-edit-card { width: 32px; height: 32px; border: none; background: #f1f5f9; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); transition: all 0.2s; }
         .btn-edit-card:hover { background: var(--primary); color: white; }
+        
+        /* Modal Styles */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: white; border-radius: 16px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--border); }
+        .modal-title { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .modal-title i { color: var(--warning); }
+        .btn-close { width: 32px; height: 32px; border: none; background: #f1f5f9; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); }
+        .btn-close:hover { background: var(--danger); color: white; }
+        .modal-body { padding: 24px; }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+        .form-input { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; transition: all 0.2s; }
+        .form-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .modal-footer { display: flex; gap: 12px; padding: 20px 24px; border-top: 1px solid var(--border); }
+        .btn-cancel { flex: 1; padding: 12px 24px; border: 1px solid var(--border); background: white; border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer; }
+        .btn-cancel:hover { background: var(--bg); }
+        .btn-save { flex: 1; padding: 12px 24px; border: none; background: var(--primary); border-radius: 10px; font-size: 14px; font-weight: 600; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-save:hover { background: var(--primary-dark); }
     </style>
 </head>
 <body>
@@ -105,53 +98,67 @@
         </header>
 
         <div class="container">
-            <div id="errorContainer"></div>
             <div class="projects-grid" id="projectsGrid">
-                <div class="loading"><i class="fas fa-spinner fa-spin"></i> 載入中...</div>
+                <div style="text-align:center;padding:60px;color:#666;"><i class="fas fa-spinner fa-spin"></i> 載入中...</div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-    <script>
-        // 測試資料（直接顯示，確認網站運作正常）
-        const testProjects = [
-            {
-                id: 'A0010-260317',
-                name: '20寸/28寸行李箱+logo印刷',
-                client: '高柏科技',
-                contact: '張經理',
-                progress: 30,
-                startDate: '2026-03-30',
-                totalQuantity: 7000,
-                deliveryDate: '2025-04-15'
-            },
-            {
-                id: 'A0011-260318',
-                name: '鋁合金手機支架',
-                client: '創新科技',
-                contact: '李小姐',
-                progress: 25,
-                startDate: '2026-03-30',
-                totalQuantity: 5000,
-                deliveryDate: '2025-04-10'
-            },
-            {
-                id: 'A0012-260319',
-                name: 'USB-C 充電線組',
-                client: '數位生活',
-                contact: '王先生',
-                progress: 60,
-                startDate: '2026-03-30',
-                totalQuantity: 20000,
-                deliveryDate: '2025-04-20'
-            }
-        ];
+    <!-- Edit Modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-pencil-alt"></i>
+                    編輯專案
+                </div>
+                <button class="btn-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editId">
+                <div class="form-group">
+                    <label class="form-label">案名</label>
+                    <input type="text" class="form-input" id="editName" placeholder="輸入案名">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">聯絡人</label>
+                    <input type="text" class="form-input" id="editContact" placeholder="輸入聯絡人">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">開始日期</label>
+                        <input type="date" class="form-input" id="editStartDate">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">交期</label>
+                        <input type="date" class="form-input" id="editDeliveryDate">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">數量</label>
+                    <input type="number" class="form-input" id="editQuantity" placeholder="輸入數量">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal()">取消</button>
+                <button class="btn-save" onclick="saveEdit()">
+                    <i class="fas fa-check"></i>
+                    更新
+                </button>
+            </div>
+        </div>
+    </div>
 
-        function showError(msg) {
-            document.getElementById('errorContainer').innerHTML = 
-                '<div class="error-box"><i class="fas fa-exclamation-triangle"></i> ' + msg + '</div>';
-        }
+    <script>
+        // 測試資料
+        let projects = [
+            { id: 'A0010-260317', name: '20寸/28寸行李箱+logo印刷', client: '高柏科技', contact: 'Joanne', progress: 30, startDate: '2026-03-30', totalQuantity: 7000, deliveryDate: '2025-04-15' },
+            { id: 'A0011-260318', name: '鋁合金手機支架', client: '創新科技', contact: 'Alex', progress: 25, startDate: '2026-03-30', totalQuantity: 5000, deliveryDate: '2025-04-10' },
+            { id: 'A0012-260319', name: 'USB-C 充電線組', client: '數位生活', contact: '小陳', progress: 60, startDate: '2026-03-30', totalQuantity: 20000, deliveryDate: '2025-04-20' }
+        ];
 
         function getDayOfWeek(dateStr) {
             if (!dateStr) return '-';
@@ -161,19 +168,15 @@
             return '星期' + days[date.getDay()];
         }
 
-        function renderProjects(projects) {
+        function renderProjects() {
             const grid = document.getElementById('projectsGrid');
-            if (!projects || projects.length === 0) {
-                grid.innerHTML = '<div class="loading">暫無資料</div>';
-                return;
-            }
             grid.innerHTML = projects.map(project => {
                 const deliveryDay = getDayOfWeek(project.deliveryDate);
                 return `
-                <div class="project-card" onclick="alert('查看專案: ${project.id}')">
+                <div class="project-card" onclick="viewProject('${project.id}')">
                     <div class="card-header">
                         <span class="project-id">${project.id}</span>
-                        <button class="btn-edit-card" onclick="event.stopPropagation(); alert('編輯: ${project.id}')">
+                        <button class="btn-edit-card" onclick="event.stopPropagation(); openEditModal('${project.id}')" title="編輯">
                             <i class="fas fa-edit"></i>
                         </button>
                     </div>
@@ -204,43 +207,58 @@
             `}).join('');
         }
 
-        // 頁面載入時先顯示測試資料
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('顯示測試資料...');
-            renderProjects(testProjects);
+        function viewProject(id) {
+            console.log('查看專案:', id);
+        }
+
+        // 開啟編輯視窗
+        function openEditModal(id) {
+            const project = projects.find(p => p.id === id);
+            if (!project) return;
             
-            // 然後嘗試從 Supabase 載入真實資料
-            loadFromSupabase();
+            document.getElementById('editId').value = id;
+            document.getElementById('editName').value = project.name;
+            document.getElementById('editContact').value = project.contact;
+            document.getElementById('editStartDate').value = project.startDate;
+            document.getElementById('editDeliveryDate').value = project.deliveryDate;
+            document.getElementById('editQuantity').value = project.totalQuantity;
+            
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        // 關閉編輯視窗
+        function closeModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+
+        // 儲存編輯
+        function saveEdit() {
+            const id = document.getElementById('editId').value;
+            const project = projects.find(p => p.id === id);
+            if (!project) return;
+            
+            project.name = document.getElementById('editName').value;
+            project.contact = document.getElementById('editContact').value;
+            project.startDate = document.getElementById('editStartDate').value;
+            project.deliveryDate = document.getElementById('editDeliveryDate').value;
+            project.totalQuantity = parseInt(document.getElementById('editQuantity').value) || 0;
+            
+            renderProjects();
+            closeModal();
+            
+            // 顯示成功提示
+            alert('專案已更新！');
+        }
+
+        // 點擊 modal 外部關閉
+        document.getElementById('editModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
         });
 
-        async function loadFromSupabase() {
-            try {
-                if (typeof supabase === 'undefined') {
-                    console.log('Supabase 未載入，使用測試資料');
-                    return;
-                }
-                
-                const client = supabase.createClient(
-                    'https://rbtkdhmpaiufirvkexwn.supabase.co',
-                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJidGtkaG1wYWl1ZmlydmtleHduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NTIxOTQsImV4cCI6MjA5MDQyODE5NH0.T-M79J0-gNoKZF2XLoGuFDHn41VDL46XMyDk99ucZmw'
-                );
-                
-                const { data: orders, error } = await client.from('orders').select('*');
-                
-                if (error) {
-                    console.error('Supabase 錯誤:', error);
-                    showError('Supabase 連線失敗: ' + error.message);
-                    return;
-                }
-                
-                if (orders && orders.length > 0) {
-                    console.log('從 Supabase 載入', orders.length, '筆資料');
-                    // 這裡可以轉換並顯示真實資料
-                }
-            } catch (e) {
-                console.error('載入 Supabase 失敗:', e);
-            }
-        }
+        // 頁面載入時初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            renderProjects();
+        });
     </script>
 </body>
 </html>
