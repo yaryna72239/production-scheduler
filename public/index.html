@@ -3,215 +3,1072 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>生產排程系統</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>PRODUCTION SCHEDULER | 專業生產排程系統</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary: #f59e0b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --dark: #0f172a;
+            --dark-2: #1e293b;
+            --dark-3: #334155;
+            --gray: #64748b;
+            --gray-light: #94a3b8;
+            --gray-lighter: #cbd5e1;
+            --light: #f1f5f9;
+            --lighter: #f8fafc;
+            --white: #ffffff;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --radius-sm: 8px;
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Header */
+        .header {
+            background: var(--white);
+            border-bottom: 1px solid var(--gray-lighter);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+        }
+
+        .header-inner {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 32px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-1);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 24px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 800;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-subtitle {
+            font-size: 12px;
+            color: var(--gray);
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            border: none;
+            background: transparent;
+            color: var(--gray);
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn:hover {
+            background: var(--lighter);
+            color: var(--dark);
+        }
+
+        .nav-btn.active {
+            background: var(--gradient-1);
+            color: var(--white);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--gradient-1);
+            color: var(--white);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--dark);
+            border: 2px solid var(--gray-lighter);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Main Content */
+        .main {
+            margin-top: 80px;
+            padding: 32px;
+            max-width: 1440px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .stat-card.primary::before { background: var(--gradient-1); }
+        .stat-card.success::before { background: var(--gradient-4); }
+        .stat-card.warning::before { background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); }
+        .stat-card.info::before { background: var(--gradient-3); }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .stat-card.primary .stat-icon { background: rgba(99, 102, 241, 0.1); color: var(--primary); }
+        .stat-card.success .stat-icon { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .stat-card.warning .stat-icon { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .stat-card.info .stat-icon { background: rgba(59, 130, 246, 0.1); color: var(--info); }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .stat-change {
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .stat-change.positive { color: var(--success); }
+        .stat-change.negative { color: var(--danger); }
+
+        /* Content Card */
+        .content-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Calendar */
+        .calendar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 32px;
+            background: var(--lighter);
+        }
+
+        .calendar-nav {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .calendar-month {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .calendar-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: var(--white);
+            border-radius: var(--radius);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray);
+            transition: all 0.2s;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .calendar-btn:hover {
+            background: var(--primary);
+            color: var(--white);
+            transform: scale(1.05);
+        }
+
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 1px;
-            background: #e5e7eb;
         }
-        .calendar-day {
-            background: white;
-            min-height: 120px;
-            padding: 8px;
-        }
-        .calendar-day:hover {
-            background: #f3f4f6;
-        }
-        .schedule-item {
+
+        .calendar-weekday {
+            padding: 16px;
+            text-align: center;
             font-size: 12px;
-            padding: 4px 8px;
-            margin: 2px 0;
-            border-radius: 4px;
+            font-weight: 700;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: var(--lighter);
+            border-bottom: 1px solid var(--light);
+        }
+
+        .calendar-day {
+            min-height: 140px;
+            padding: 12px;
+            border-right: 1px solid var(--light);
+            border-bottom: 1px solid var(--light);
+            background: var(--white);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .calendar-day:nth-child(7n) {
+            border-right: none;
+        }
+
+        .calendar-day:hover {
+            background: var(--lighter);
+        }
+
+        .calendar-day.other-month {
+            background: var(--lighter);
+            color: var(--gray-light);
+        }
+
+        .calendar-day-number {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-bottom: 8px;
+        }
+
+        .calendar-day.today .calendar-day-number {
+            background: var(--gradient-1);
+            color: var(--white);
+        }
+
+        .schedule-item {
+            padding: 6px 10px;
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 4px;
             cursor: pointer;
             transition: all 0.2s;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
+
         .schedule-item:hover {
-            transform: translateX(2px);
+            transform: translateX(4px);
         }
-        .status-pending { background: #fef3c7; border-left: 3px solid #f59e0b; }
-        .status-progress { background: #dbeafe; border-left: 3px solid #3b82f6; }
-        .status-complete { background: #d1fae5; border-left: 3px solid #10b981; }
-        .modal {
+
+        .schedule-item.pending {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+            border-left: 3px solid var(--warning);
+        }
+
+        .schedule-item.progress {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: #1e40af;
+            border-left: 3px solid var(--info);
+        }
+
+        .schedule-item.complete {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+            border-left: 3px solid var(--success);
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            padding: 16px 24px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: var(--lighter);
+            border-bottom: 1px solid var(--light);
+        }
+
+        .data-table td {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--light);
+        }
+
+        .data-table tr:hover td {
+            background: var(--lighter);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-badge.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-badge.progress {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-badge.complete {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .status-badge.pending .status-dot { background: var(--warning); }
+        .status-badge.progress .status-dot { background: var(--info); }
+        .status-badge.complete .status-dot { background: var(--success); }
+
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: var(--lighter);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray);
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            color: var(--white);
+            transform: scale(1.1);
+        }
+
+        .action-btn.delete:hover {
+            background: var(--danger);
+        }
+
+        /* Search */
+        .search-box {
+            position: relative;
+        }
+
+        .search-input {
+            padding: 12px 16px 12px 44px;
+            border: 2px solid var(--light);
+            border-radius: var(--radius);
+            font-size: 14px;
+            width: 300px;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        /* Stats View */
+        .stats-view-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            padding: 32px;
+        }
+
+        .chart-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 24px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--light);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .progress-fill.primary { background: var(--gradient-1); }
+        .progress-fill.success { background: var(--gradient-4); }
+        .progress-fill.warning { background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); }
+        .progress-fill.info { background: var(--gradient-3); }
+
+        .chart-item {
+            margin-bottom: 20px;
+        }
+
+        .chart-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .chart-item-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .chart-item-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* Modal */
+        .modal-overlay {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
-        .modal.active {
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            width: 100%;
+            max-width: 560px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            animation: modalIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .modal-close {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: var(--lighter);
+            border-radius: var(--radius);
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            color: var(--gray);
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        .modal-body {
+            padding: 32px;
+            overflow-y: auto;
+            max-height: calc(90vh - 200px);
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid var(--light);
+            border-radius: var(--radius);
+            font-size: 15px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .modal-footer {
+            padding: 24px 32px;
+            border-top: 1px solid var(--light);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 40px;
+        }
+
+        .empty-icon {
+            width: 120px;
+            height: 120px;
+            background: var(--lighter);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 48px;
+            color: var(--gray);
+        }
+
+        .empty-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .empty-text {
+            font-size: 15px;
+            color: var(--gray);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-inner {
+                padding: 0 16px;
+                height: 64px;
+            }
+
+            .logo-text {
+                display: none;
+            }
+
+            .nav {
+                display: none;
+            }
+
+            .main {
+                margin-top: 64px;
+                padding: 16px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .calendar-day {
+                min-height: 80px;
+                padding: 8px;
+            }
+
+            .stats-view-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-in {
+            animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* View Toggle */
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
         }
     </style>
 </head>
-<body class="bg-gray-100">
-    <!-- 導航列 -->
-    <nav class="bg-blue-600 text-white shadow-lg">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-2">
-                <i class="fas fa-industry text-2xl"></i>
-                <h1 class="text-xl font-bold">生產排程系統</h1>
-            </div>
-            <div class="flex space-x-4">
-                <button onclick="changeView('calendar')" class="px-4 py-2 rounded hover:bg-blue-700 transition" id="btn-calendar">
-                    <i class="fas fa-calendar-alt"></i> 日曆
-                </button>
-                <button onclick="changeView('list')" class="px-4 py-2 rounded hover:bg-blue-700 transition" id="btn-list">
-                    <i class="fas fa-list"></i> 列表
-                </button>
-                <button onclick="changeView('stats')" class="px-4 py-2 rounded hover:bg-blue-700 transition" id="btn-stats">
-                    <i class="fas fa-chart-bar"></i> 統計
-                </button>
-            </div>
-            <button onclick="openModal()" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg transition">
-                <i class="fas fa-plus"></i> 新增工單
-            </button>
-        </div>
-    </nav>
-
-    <!-- 主內容 -->
-    <div class="container mx-auto px-4 py-6">
-        
-        <!-- 統計卡片 -->
-        <div class="grid grid-cols-4 gap-4 mb-6">
-            <div class="bg-white rounded-lg shadow p-4">
-                <div class="text-gray-500 text-sm">本月工單</div>
-                <div class="text-2xl font-bold text-blue-600" id="stat-total">0</div>
-            </div>
-            <div class="bg-white rounded-lg shadow p-4">
-                <div class="text-gray-500 text-sm">待產</div>
-                <div class="text-2xl font-bold text-yellow-600" id="stat-pending">0</div>
-            </div>
-            <div class="bg-white rounded-lg shadow p-4">
-                <div class="text-gray-500 text-sm">生產中</div>
-                <div class="text-2xl font-bold text-blue-600" id="stat-progress">0</div>
-            </div>
-            <div class="bg-white rounded-lg shadow p-4">
-                <div class="text-gray-500 text-sm">已完成</div>
-                <div class="text-2xl font-bold text-green-600" id="stat-complete">0</div>
-            </div>
-        </div>
-
-        <!-- 日曆視圖 -->
-        <div id="view-calendar" class="bg-white rounded-lg shadow">
-            <div class="flex justify-between items-center p-4 border-b">
-                <button onclick="changeMonth(-1)" class="px-3 py-1 rounded hover:bg-gray-100">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <h2 class="text-xl font-bold" id="current-month">2024年 3月</h2>
-                <button onclick="changeMonth(1)" class="px-3 py-1 rounded hover:bg-gray-100">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
-            
-            <div class="calendar-grid">
-                <div class="bg-gray-50 p-2 text-center font-semibold text-gray-600">日</div>
-                <div class="bg-gray-50 p-2 text-center font-semibold text-gray-600">一</div>
-                <div class="bg-gray-50 p-2 text-center font-semibold text-gray-600">二</div>
-                <div class="bg-gray-50 p-2 text-center font-semibold text-gray-600">三</div>
-                <div class="bg-gray-50 p-2 text-center font-semibold text-gray-600">四</div>
-                <div class="bg-gray-50 p-2 text-center font-semibold text-gray-600">五</div>
-                <div class="bg-gray-50 p-2 text-center font-semibold text-gray-600">六</div>
-            </div>
-            <div id="calendar-body" class="calendar-grid"></div>
-        </div>
-
-        <!-- 列表視圖 -->
-        <div id="view-list" class="hidden bg-white rounded-lg shadow">
-            <div class="p-4 border-b">
-                <input type="text" id="search-input" placeholder="搜尋工單..." 
-                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                       onkeyup="searchOrders()">
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-4 py-3 text-left">工單編號</th>
-                            <th class="px-4 py-3 text-left">日期</th>
-                            <th class="px-4 py-3 text-left">產品名稱</th>
-                            <th class="px-4 py-3 text-left">數量</th>
-                            <th class="px-4 py-3 text-left">產線</th>
-                            <th class="px-4 py-3 text-left">狀態</th>
-                            <th class="px-4 py-3 text-left">操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="list-body"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- 統計視圖 -->
-        <div id="view-stats" class="hidden">
-            <div class="grid grid-cols-2 gap-6">
-                <div class="bg-white rounded-lg shadow p-6">
-                    <h3 class="text-lg font-bold mb-4">產線產能分佈</h3>
-                    <div id="line-chart" class="space-y-3"></div>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-inner">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-industry"></i>
                 </div>
-                
-                <div class="bg-white rounded-lg shadow p-6">
-                    <h3 class="text-lg font-bold mb-4">狀態分佈</h3>
-                    <div class="flex items-center justify-center h-48">
-                        <div id="status-pie" class="text-center"></div>
+                <div>
+                    <div class="logo-text">PRODUCTION SCHEDULER</div>
+                    <div class="logo-subtitle">專業生產排程系統</div>
+                </div>
+            </div>
+
+            <nav class="nav">
+                <button class="nav-btn active" onclick="changeView('calendar')" id="nav-calendar">
+                    <i class="fas fa-calendar-alt"></i>
+                    日曆
+                </button>
+                <button class="nav-btn" onclick="changeView('list')" id="nav-list">
+                    <i class="fas fa-list"></i>
+                    列表
+                </button>
+                <button class="nav-btn" onclick="changeView('stats')" id="nav-stats">
+                    <i class="fas fa-chart-pie"></i>
+                    統計
+                </button>
+            </nav>
+
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="openModal()">
+                    <i class="fas fa-plus"></i>
+                    新增工單
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card primary">
+                <div class="stat-header">
+                    <span class="stat-label">本月工單</span>
+                    <div class="stat-icon">
+                        <i class="fas fa-clipboard-list"></i>
                     </div>
                 </div>
+                <div class="stat-value" id="stat-total">0</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+12% 較上月</span>
+                </div>
+            </div>
+
+            <div class="stat-card warning">
+                <div class="stat-header">
+                    <span class="stat-label">待產</span>
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="stat-pending">0</div>
+                <div class="stat-change">
+                    <span>等待排程</span>
+                </div>
+            </div>
+
+            <div class="stat-card info">
+                <div class="stat-header">
+                    <span class="stat-label">生產中</span>
+                    <div class="stat-icon">
+                        <i class="fas fa-spinner"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="stat-progress">0</div>
+                <div class="stat-change">
+                    <span>進行中</span>
+                </div>
+            </div>
+
+            <div class="stat-card success">
+                <div class="stat-header">
+                    <span class="stat-label">已完成</span>
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="stat-complete">0</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+8% 達成率</span>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- 新增/編輯 Modal -->
-    <div id="modal" class="modal">
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4">
-            <div class="flex justify-between items-center p-4 border-b">
-                <h3 class="text-lg font-bold" id="modal-title">新增工單</h3>
-                <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700">
+        <!-- Calendar View -->
+        <div id="view-calendar" class="view-section active">
+            <div class="content-card">
+                <div class="calendar-header">
+                    <div class="calendar-nav">
+                        <button class="calendar-btn" onclick="changeMonth(-1)">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <div class="calendar-month" id="calendar-month">2024年 3月</div>
+                        <button class="calendar-btn" onclick="changeMonth(1)">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="calendar-grid">
+                    <div class="calendar-weekday">日</div>
+                    <div class="calendar-weekday">一</div>
+                    <div class="calendar-weekday">二</div>
+                    <div class="calendar-weekday">三</div>
+                    <div class="calendar-weekday">四</div>
+                    <div class="calendar-weekday">五</div>
+                    <div class="calendar-weekday">六</div>
+                </div>
+                <div id="calendar-body" class="calendar-grid"></div>
+            </div>
+        </div>
+
+        <!-- List View -->
+        <div id="view-list" class="view-section">
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title">工單列表</h2>
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" id="search-input" 
+                               placeholder="搜尋工單..." onkeyup="searchOrders()">
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>工單編號</th>
+                                <th>日期</th>
+                                <th>產品名稱</th>
+                                <th>數量</th>
+                                <th>產線</th>
+                                <th>狀態</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="list-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats View -->
+        <div id="view-stats" class="view-section">
+            <div class="stats-view-grid">
+                <div class="chart-card">
+                    <h3 class="chart-title">產線產能分佈</h3>
+                    <div id="line-chart"></div>
+                </div>
+
+                <div class="chart-card">
+                    <h3 class="chart-title">狀態分佈</h3>
+                    <div id="status-chart"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">新增工單</h3>
+                <button class="modal-close" onclick="closeModal()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             
-            <form id="orderForm" class="p-4 space-y-4">
+            <form id="orderForm" class="modal-body">
                 <input type="hidden" id="orderId">
                 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">工單編號</label>
-                    <input type="text" id="orderNo" required
-                           class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                           placeholder="例如：WO-202403-001">
+                <div class="form-group">
+                    <label class="form-label">工單編號</label>
+                    <input type="text" id="orderNo" class="form-input" 
+                           placeholder="例如：WO-202403-001" required>
                 </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">生產日期</label>
-                    <input type="date" id="orderDate" required
-                           class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                <div class="form-group">
+                    <label class="form-label">生產日期</label>
+                    <input type="date" id="orderDate" class="form-input" required>
                 </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">產品名稱</label>
-                    <input type="text" id="productName" required
-                           class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                           placeholder="請輸入產品名稱">
+
+                <div class="form-group">
+                    <label class="form-label">產品名稱</label>
+                    <input type="text" id="productName" class="form-input" 
+                           placeholder="請輸入產品名稱" required>
                 </div>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">數量</label>
-                        <input type="number" id="quantity" required min="1"
-                               class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                               placeholder="0">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">數量</label>
+                        <input type="number" id="quantity" class="form-input" 
+                               placeholder="0" min="1" required>
                     </div>
                     
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">產線</label>
-                        <select id="productionLine" required
-                                class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <div class="form-group">
+                        <label class="form-label">產線</label>
+                        <select id="productionLine" class="form-select" required>
                             <option value="">選擇產線</option>
                             <option value="A線">A線</option>
                             <option value="B線">B線</option>
@@ -220,108 +1077,63 @@
                         </select>
                     </div>
                 </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">狀態</label>
-                    <select id="status" required
-                            class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                <div class="form-group">
+                    <label class="form-label">狀態</label>
+                    <select id="status" class="form-select" required>
                         <option value="pending">待產</option>
                         <option value="progress">生產中</option>
                         <option value="complete">已完成</option>
                     </select>
                 </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">備註</label>
-                    <textarea id="note" rows="3"
-                              class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+
+                <div class="form-group">
+                    <label class="form-label">備註</label>
+                    <textarea id="note" class="form-textarea" 
                               placeholder="請輸入備註（選填）"></textarea>
                 </div>
-                
-                <div class="flex justify-end space-x-3 pt-4">
-                    <button type="button" onclick="closeModal()"
-                            class="px-4 py-2 border rounded-lg hover:bg-gray-100">取消</button>
-                    <button type="submit"
-                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">儲存</button>
-                </div>
             </form>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveOrder()">儲存</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // 資料儲存
+        // Data
         let orders = JSON.parse(localStorage.getItem('productionOrders') || '[]');
         let currentDate = new Date();
         let currentView = 'calendar';
 
-        // 初始化
+        // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            renderCalendar();
             updateStats();
+            renderCalendar();
             renderList();
-            renderStats();
+            renderCharts();
         });
 
-        // 切換視圖
+        // View Management
         function changeView(view) {
             currentView = view;
-            document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`view-${view}`).classList.remove('hidden');
             
-            document.querySelectorAll('[id^="btn-"]').forEach(el => {
-                el.classList.remove('bg-blue-700');
-            });
-            document.getElementById(`btn-${view}`).classList.add('bg-blue-700');
+            // Update nav
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`nav-${view}`).classList.add('active');
+            
+            // Update view
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+            document.getElementById(`view-${view}`).classList.add('active');
+            
+            // Refresh data
+            if (view === 'calendar') renderCalendar();
+            if (view === 'list') renderList();
+            if (view === 'stats') renderCharts();
         }
 
-        // 渲染日曆
-        function renderCalendar() {
-            const year = currentDate.getFullYear();
-            const month = currentDate.getMonth();
-            
-            document.getElementById('current-month').textContent = 
-                `${year}年 ${month + 1}月`;
-            
-            const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            
-            const calendarBody = document.getElementById('calendar-body');
-            calendarBody.innerHTML = '';
-            
-            // 空白格子
-            for (let i = 0; i < firstDay; i++) {
-                calendarBody.innerHTML += '<div class="calendar-day bg-gray-50"></div>';
-            }
-            
-            // 日期格子
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const dayOrders = orders.filter(o => o.date === dateStr);
-                
-                let ordersHtml = dayOrders.map(o => {
-                    const statusClass = `status-${o.status}`;
-                    return `<div class="schedule-item ${statusClass}" onclick="editOrder('${o.id}')">
-                        <div class="font-semibold">${o.orderNo}</div>
-                        <div class="text-xs">${o.productName}</div>
-                    </div>`;
-                }).join('');
-                
-                calendarBody.innerHTML += `
-                    <div class="calendar-day">
-                        <div class="font-semibold text-gray-700 mb-1">${day}</div>
-                        ${ordersHtml}
-                    </div>
-                `;
-            }
-        }
-
-        // 切換月份
-        function changeMonth(delta) {
-            currentDate.setMonth(currentDate.getMonth() + delta);
-            renderCalendar();
-        }
-
-        // 更新統計
+        // Stats
         function updateStats() {
             const thisMonth = orders.filter(o => {
                 const orderDate = new Date(o.date);
@@ -329,23 +1141,120 @@
                        orderDate.getFullYear() === currentDate.getFullYear();
             });
             
-            document.getElementById('stat-total').textContent = thisMonth.length;
-            document.getElementById('stat-pending').textContent = 
-                thisMonth.filter(o => o.status === 'pending').length;
-            document.getElementById('stat-progress').textContent = 
-                thisMonth.filter(o => o.status === 'progress').length;
-            document.getElementById('stat-complete').textContent = 
-                thisMonth.filter(o => o.status === 'complete').length;
+            animateNumber('stat-total', thisMonth.length);
+            animateNumber('stat-pending', thisMonth.filter(o => o.status === 'pending').length);
+            animateNumber('stat-progress', thisMonth.filter(o => o.status === 'progress').length);
+            animateNumber('stat-complete', thisMonth.filter(o => o.status === 'complete').length);
         }
 
-        // 渲染列表
+        function animateNumber(id, target) {
+            const el = document.getElementById(id);
+            const start = parseInt(el.textContent);
+            const duration = 600;
+            const startTime = performance.now();
+            
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeProgress = 1 - Math.pow(1 - progress, 3);
+                const current = Math.round(start + (target - start) * easeProgress);
+                el.textContent = current;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+            
+            requestAnimationFrame(update);
+        }
+
+        // Calendar
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            document.getElementById('calendar-month').textContent = 
+                `${year}年 ${month + 1}月`;
+            
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const prevDaysInMonth = new Date(year, month, 0).getDate();
+            
+            const calendarBody = document.getElementById('calendar-body');
+            calendarBody.innerHTML = '';
+            
+            // Previous month days
+            for (let i = firstDay - 1; i >= 0; i--) {
+                const day = prevDaysInMonth - i;
+                calendarBody.innerHTML += `
+                    <div class="calendar-day other-month">
+                        <div class="calendar-day-number">${day}</div>
+                    </div>
+                `;
+            }
+            
+            // Current month days
+            const today = new Date();
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayOrders = orders.filter(o => o.date === dateStr);
+                const isToday = today.getFullYear() === year && 
+                               today.getMonth() === month && 
+                               today.getDate() === day;
+                
+                let ordersHtml = dayOrders.map(o => `
+                    <div class="schedule-item ${o.status}" onclick="event.stopPropagation(); editOrder('${o.id}')"
+                         title="${o.orderNo} - ${o.productName}">
+                        ${o.orderNo}
+                    </div>
+                `).join('');
+                
+                calendarBody.innerHTML += `
+                    <div class="calendar-day ${isToday ? 'today' : ''}" onclick="selectDate('${dateStr}')">
+                        <div class="calendar-day-number">${day}</div>
+                        ${ordersHtml}
+                    </div>
+                `;
+            }
+            
+            // Next month days
+            const remainingCells = 42 - (firstDay + daysInMonth);
+            for (let day = 1; day <= remainingCells; day++) {
+                calendarBody.innerHTML += `
+                    <div class="calendar-day other-month">
+                        <div class="calendar-day-number">${day}</div>
+                    </div>
+                `;
+            }
+        }
+
+        function changeMonth(delta) {
+            currentDate.setMonth(currentDate.getMonth() + delta);
+            renderCalendar();
+            updateStats();
+        }
+
+        function selectDate(date) {
+            openModal();
+            document.getElementById('orderDate').value = date;
+        }
+
+        // List
         function renderList() {
             const tbody = document.getElementById('list-body');
             
             if (orders.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="7" class="text-center py-8 text-gray-500">尚無工單資料</td>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <div class="empty-icon">
+                                    <i class="fas fa-clipboard-list"></i>
+                                </div>
+                                <div class="empty-title">尚無工單資料</div>
+                                <div class="empty-text">點擊「新增工單」開始建立您的第一筆工單</div>
+                            </div>
+                        </td>
                     </tr>
                 `;
                 return;
@@ -354,31 +1263,41 @@
             const sortedOrders = [...orders].sort((a, b) => new Date(b.date) - new Date(a.date));
             
             tbody.innerHTML = sortedOrders.map(o => {
-                const statusText = { pending: '待產', progress: '生產中', complete: '已完成' };
-                const statusColor = { pending: 'text-yellow-600', progress: 'text-blue-600', complete: 'text-green-600' };
+                const statusConfig = {
+                    pending: { text: '待產', class: 'pending' },
+                    progress: { text: '生產中', class: 'progress' },
+                    complete: { text: '已完成', class: 'complete' }
+                };
+                const status = statusConfig[o.status];
                 
                 return `
-                    <tr class="border-b hover:bg-gray-50">
-                        <td class="px-4 py-3">${o.orderNo}</td>
-                        <td class="px-4 py-3">${o.date}</td>
-                        <td class="px-4 py-3">${o.productName}</td>
-                        <td class="px-4 py-3">${o.quantity}</td>
-                        <td class="px-4 py-3">${o.productionLine}</td>
-                        <td class="px-4 py-3 ${statusColor[o.status]}">${statusText[o.status]}</td>
-                        <td class="px-4 py-3">
-                            <button onclick="editOrder('${o.id}')" class="text-blue-600 hover:text-blue-800 mr-3">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button onclick="deleteOrder('${o.id}')" class="text-red-600 hover:text-red-800">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                    <tr>
+                        <td><strong>${o.orderNo}</strong></td>
+                        <td>${o.date}</td>
+                        <td>${o.productName}</td>
+                        <td>${o.quantity}</td>
+                        <td>${o.productionLine}</td>
+                        <td>
+                            <span class="status-badge ${status.class}">
+                                <span class="status-dot"></span>
+                                ${status.text}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="action-btn" onclick="editOrder('${o.id}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete" onclick="deleteOrder('${o.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 `;
             }).join('');
         }
 
-        // 搜尋
         function searchOrders() {
             const keyword = document.getElementById('search-input').value.toLowerCase();
             const rows = document.querySelectorAll('#list-body tr');
@@ -389,56 +1308,82 @@
             });
         }
 
-        // 渲染統計
-        function renderStats() {
-            // 產線統計
+        // Charts
+        function renderCharts() {
+            // Line chart
             const lineStats = {};
             orders.forEach(o => {
                 lineStats[o.productionLine] = (lineStats[o.productionLine] || 0) + parseInt(o.quantity);
             });
             
-            const lineChart = document.getElementById('line-chart');
             const maxQty = Math.max(...Object.values(lineStats), 1);
+            const lineChart = document.getElementById('line-chart');
             
-            lineChart.innerHTML = Object.entries(lineStats).map(([line, qty]) => {
+            lineChart.innerHTML = Object.entries(lineStats).map(([line, qty], index) => {
                 const percentage = (qty / maxQty) * 100;
+                const colors = ['primary', 'success', 'warning', 'info'];
+                const color = colors[index % colors.length];
+                
                 return `
-                    <div class="flex items-center">
-                        <div class="w-16 text-sm">${line}</div>
-                        <div class="flex-1 bg-gray-200 rounded-full h-6">
-                            <div class="bg-blue-600 h-6 rounded-full flex items-center justify-end pr-2 text-white text-xs"
-                                 style="width: ${percentage}%">
-                                ${qty}
-                            </div>
+                    <div class="chart-item">
+                        <div class="chart-item-header">
+                            <span class="chart-item-label">${line}</span>
+                            <span class="chart-item-value">${qty.toLocaleString()} 件</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill ${color}" style="width: ${percentage}%"></div>
                         </div>
                     </div>
                 `;
-            }).join('') || '<div class="text-gray-500 text-center">尚無資料</div>';
+            }).join('') || '<div class="empty-state"><div class="empty-text">尚無資料</div></div>';
             
-            // 狀態統計
+            // Status chart
             const statusStats = { pending: 0, progress: 0, complete: 0 };
             orders.forEach(o => statusStats[o.status]++);
-            
             const total = orders.length || 1;
-            document.getElementById('status-pie').innerHTML = `
-                <div class="space-y-2">
-                    <div class="flex items-center justify-between">
-                        <span class="text-yellow-600">● 待產</span>
-                        <span>${Math.round(statusStats.pending/total*100)}% (${statusStats.pending})</span>
+            
+            document.getElementById('status-chart').innerHTML = `
+                <div class="space-y-4">
+                    <div class="chart-item">
+                        <div class="chart-item-header">
+                            <span class="chart-item-label">
+                                <span style="color: var(--warning)">●</span> 待產
+                            </span>
+                            <span class="chart-item-value">${Math.round(statusStats.pending/total*100)}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill warning" style="width: ${(statusStats.pending/total*100)}%"></div>
+                        </div>
                     </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-blue-600">● 生產中</span>
-                        <span>${Math.round(statusStats.progress/total*100)}% (${statusStats.progress})</span>
+                    
+                    <div class="chart-item">
+                        <div class="chart-item-header">
+                            <span class="chart-item-label">
+                                <span style="color: var(--info)">●</span> 生產中
+                            </span>
+                            <span class="chart-item-value">${Math.round(statusStats.progress/total*100)}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill info" style="width: ${(statusStats.progress/total*100)}%"></div>
+                        </div>
                     </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-green-600">● 已完成</span>
-                        <span>${Math.round(statusStats.complete/total*100)}% (${statusStats.complete})</span>
+                    
+                    <div class="chart-item">
+                        <div class="chart-item-header">
+                            <span class="chart-item-label">
+                                <span style="color: var(--success)">●</span> 已完成
+                            </span>
+                            <span class="chart-item-value">${Math.round(statusStats.complete/total*100)}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill success" style="width: ${(statusStats.complete/total*100)}%"></div>
+                        </div>
                     </div>
                 </div>
             `;
         }
 
-        // Modal 控制
+        // Modal
         function openModal() {
             document.getElementById('modal').classList.add('active');
             document.getElementById('orderForm').reset();
@@ -451,7 +1396,6 @@
             document.getElementById('modal').classList.remove('active');
         }
 
-        // 編輯工單
         function editOrder(id) {
             const order = orders.find(o => o.id === id);
             if (!order) return;
@@ -468,22 +1412,12 @@
             document.getElementById('modal-title').textContent = '編輯工單';
         }
 
-        // 刪除工單
-        function deleteOrder(id) {
-            if (!confirm('確定要刪除這筆工單嗎？')) return;
-            
-            orders = orders.filter(o => o.id !== id);
-            localStorage.setItem('productionOrders', JSON.stringify(orders));
-            
-            renderCalendar();
-            updateStats();
-            renderList();
-            renderStats();
-        }
-
-        // 表單提交
-        document.getElementById('orderForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        function saveOrder() {
+            const form = document.getElementById('orderForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
             
             const id = document.getElementById('orderId').value;
             const orderData = {
@@ -507,15 +1441,32 @@
             localStorage.setItem('productionOrders', JSON.stringify(orders));
             closeModal();
             
-            renderCalendar();
             updateStats();
+            renderCalendar();
             renderList();
-            renderStats();
-        });
+            renderCharts();
+        }
 
-        // 點擊 modal 外部關閉
+        function deleteOrder(id) {
+            if (!confirm('確定要刪除這筆工單嗎？')) return;
+            
+            orders = orders.filter(o => o.id !== id);
+            localStorage.setItem('productionOrders', JSON.stringify(orders));
+            
+            updateStats();
+            renderCalendar();
+            renderList();
+            renderCharts();
+        }
+
+        // Close modal on overlay click
         document.getElementById('modal').addEventListener('click', function(e) {
             if (e.target === this) closeModal();
+        });
+
+        // Escape key to close modal
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
         });
     </script>
 </body>
