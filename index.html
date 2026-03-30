@@ -280,9 +280,14 @@
             try {
                 document.getElementById('projectsGrid').innerHTML = '<div style="text-align:center;padding:60px;color:#666;"><i class="fas fa-spinner fa-spin"></i> 載入中...</div>';
                 
+                // 載入訂單資料，同時取得關聯的客戶和產品資訊
                 const { data: ordersData, error: ordersError } = await supabaseClient
                     .from('orders')
-                    .select('*')
+                    .select(`
+                        *,
+                        customers:customer_id (id, name, contact_person),
+                        products:product_id (id, name)
+                    `)
                     .order('created_at', { ascending: false });
                 
                 if (ordersError) throw ordersError;
@@ -291,13 +296,16 @@
                     projects = ordersData.map(order => ({
                         orderId: order.id,
                         id: order.order_no,
-                        name: order.product_name || '未命名產品',
-                        client: order.customer_name || '未知客戶',
-                        contact: order.contact_person || '',
+                        name: order.products?.name || '未命名產品',
+                        client: order.customers?.name || '未知客戶',
+                        contact: order.customers?.contact_person || '',
                         progress: order.customer_progress || 0,
                         startDate: order.created_at ? order.created_at.split('T')[0] : '',
                         totalQuantity: order.quantity || 0,
-                        deliveryDate: order.deadline || ''
+                        deliveryDate: order.deadline || '',
+                        // 儲存關聯 ID 供編輯時使用
+                        customerId: order.customer_id,
+                        productId: order.product_id
                     }));
                 } else {
                     // 如果 Supabase 沒有資料，使用靜態資料
@@ -396,7 +404,7 @@
             document.getElementById('editModal').classList.remove('active');
         }
 
-        // 儲存專案編輯 - 修正版：儲存所有欄位到 Supabase
+        // 儲存專案編輯 - 更新多個資料表
         async function saveProjectEdit() {
             const id = document.getElementById('editProjectId').value;
             const project = projects.find(p => p.id === id);
@@ -427,21 +435,52 @@
                 if (supabaseClient && project.orderId) {
                     console.log('正在儲存到 Supabase...', project.orderId);
                     
-                    const { error } = await supabaseClient
+                    // 1. 更新 orders 表
+                    const { error: orderError } = await supabaseClient
                         .from('orders')
                         .update({
-                            product_name: newName,
-                            customer_name: newClient,
-                            contact_person: newContact,
                             quantity: newQuantity,
                             deadline: newDeliveryDate,
                             updated_at: new Date().toISOString()
                         })
                         .eq('id', project.orderId);
                     
-                    if (error) {
-                        console.error('Supabase 儲存錯誤:', error);
-                        throw error;
+                    if (orderError) {
+                        console.error('orders 表更新錯誤:', orderError);
+                        throw orderError;
+                    }
+                    
+                    // 2. 更新 customers 表（如果有 customerId）
+                    if (project.customerId) {
+                        const { error: customerError } = await supabaseClient
+                            .from('customers')
+                            .update({
+                                name: newClient,
+                                contact_person: newContact,
+                                updated_at: new Date().toISOString()
+                            })
+                            .eq('id', project.customerId);
+                        
+                        if (customerError) {
+                            console.error('customers 表更新錯誤:', customerError);
+                            // 不拋出錯誤，繼續執行
+                        }
+                    }
+                    
+                    // 3. 更新 products 表（如果有 productId）
+                    if (project.productId) {
+                        const { error: productError } = await supabaseClient
+                            .from('products')
+                            .update({
+                                name: newName,
+                                updated_at: new Date().toISOString()
+                            })
+                            .eq('id', project.productId);
+                        
+                        if (productError) {
+                            console.error('products 表更新錯誤:', productError);
+                            // 不拋出錯誤，繼續執行
+                        }
                     }
                     
                     console.log('Supabase 儲存成功');
