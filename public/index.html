@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生產排程系統</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: #e5e7eb;
+        }
+        .calendar-day {
+            background: white;
+            min-height: 120px;
+            padding: 8px;
+        }
+        .calendar-day:hover {
+            background: #f3f4f6;
+        }
+        .schedule-item {
+            font-size: 12px;
+            padding: 4px 8px;
+            margin: 2px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .schedule-item:hover {
+            transform: translateX(2px);
+        }
+        .status-pending { background: #fef3c7; border-left: 3px solid #f59e0b; }
+        .status-progress { background: #dbeafe; border-left: 3px solid #3b82f6; }
+        .status-complete { background: #d1fae5; border-left: 3px solid #10b981; }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- 導航列 -->
+    <nav class="bg-blue-600 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-industry text-2xl"></i>
+                <h1 class="text-xl font-bold">生產排程系統</h1>
+            </div>
+            <div class="flex space-x-4">
+                <button onclick="changeView('calendar')" class="px-4 py-2 rounded hover:bg-blue-700 transition" id="btn-calendar">
+                    <i class="fas fa-calendar-alt"></i> 日曆
+                </button>
+                <button onclick="changeView('list')" class="px-4 py-2 rounded hover:bg-blue-700 transition" id="btn-list">
+                    <i class="fas fa-list"></i> 列表
+                </button>
+                <button onclick="changeView('stats')" class="px-4 py-2 rounded hover:bg-blue-700 transition" id="btn-stats">
+                    <i class="fas fa-chart-bar"></i> 統計
+                </button>
+            </div>
+            <button onclick="openModal()" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg transition">
+                <i class="fas fa-plus"></i> 新增工單
+            </button>
+        </div>
+    </nav>
+
+    <!-- 主內容 -->
+    <div class="container mx-auto px-4 py-6">
+        
+        <!-- 統計卡片 -->
+        <div class="grid grid-cols-4 gap-4 mb-6">
+            <div class="bg-white rounded-lg shadow p-4">
+                <div class="text-gray-500 text-sm">本月工單</div>
+                <div class="text-2xl font-bold text-blue-600" id="stat-total">0</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4">
+                <div class="text-gray-500 text-sm">待產</div>
+                <div class="text-2xl font-bold text-yellow-600" id="stat-pending">0</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4">
+                <div class="text-gray-500 text-sm">生產中</div>
+                <div class="text-2xl font-bold text-blue-600" id="stat-progress">0</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4">
+                <div class="text-gray-500 text-sm">已完成</div>
+                <div class="text-2xl font-bold text-green-600" id="stat-complete">0</div>
+            </div>
+        </div>
+
+        <!-- 日曆視圖 -->
+        <div id="view-calendar" class="bg-white rounded-lg shadow">
+            <div class="flex justify-between items-center p-4 border-b">
+                <button onclick="changeMonth(-1)" class="px-3 py-1 rounded hover:bg-gray-100">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <h2 class="text-xl font-bold" id="current-month">2024年 3月</h2>
+                <button onclick="changeMonth(1)" class="px-3 py-1 rounded hover:bg-gray-100">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            
+            <div class="calendar-grid">
+                <div class="bg-gray-50 p-2 text-center font-semibold text-gray-600">日</div>
+                <div class="bg-gray-50 p-2 text-center font-semibold text-gray-600">一</div>
+                <div class="bg-gray-50 p-2 text-center font-semibold text-gray-600">二</div>
+                <div class="bg-gray-50 p-2 text-center font-semibold text-gray-600">三</div>
+                <div class="bg-gray-50 p-2 text-center font-semibold text-gray-600">四</div>
+                <div class="bg-gray-50 p-2 text-center font-semibold text-gray-600">五</div>
+                <div class="bg-gray-50 p-2 text-center font-semibold text-gray-600">六</div>
+            </div>
+            <div id="calendar-body" class="calendar-grid"></div>
+        </div>
+
+        <!-- 列表視圖 -->
+        <div id="view-list" class="hidden bg-white rounded-lg shadow">
+            <div class="p-4 border-b">
+                <input type="text" id="search-input" placeholder="搜尋工單..." 
+                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       onkeyup="searchOrders()">
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left">工單編號</th>
+                            <th class="px-4 py-3 text-left">日期</th>
+                            <th class="px-4 py-3 text-left">產品名稱</th>
+                            <th class="px-4 py-3 text-left">數量</th>
+                            <th class="px-4 py-3 text-left">產線</th>
+                            <th class="px-4 py-3 text-left">狀態</th>
+                            <th class="px-4 py-3 text-left">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="list-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 統計視圖 -->
+        <div id="view-stats" class="hidden">
+            <div class="grid grid-cols-2 gap-6">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-bold mb-4">產線產能分佈</h3>
+                    <div id="line-chart" class="space-y-3"></div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-bold mb-4">狀態分佈</h3>
+                    <div class="flex items-center justify-center h-48">
+                        <div id="status-pie" class="text-center"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增/編輯 Modal -->
+    <div id="modal" class="modal">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h3 class="text-lg font-bold" id="modal-title">新增工單</h3>
+                <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="orderForm" class="p-4 space-y-4">
+                <input type="hidden" id="orderId">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">工單編號</label>
+                    <input type="text" id="orderNo" required
+                           class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           placeholder="例如：WO-202403-001">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">生產日期</label>
+                    <input type="date" id="orderDate" required
+                           class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">產品名稱</label>
+                    <input type="text" id="productName" required
+                           class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           placeholder="請輸入產品名稱">
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">數量</label>
+                        <input type="number" id="quantity" required min="1"
+                               class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               placeholder="0">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">產線</label>
+                        <select id="productionLine" required
+                                class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">選擇產線</option>
+                            <option value="A線">A線</option>
+                            <option value="B線">B線</option>
+                            <option value="C線">C線</option>
+                            <option value="D線">D線</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">狀態</label>
+                    <select id="status" required
+                            class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="pending">待產</option>
+                        <option value="progress">生產中</option>
+                        <option value="complete">已完成</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">備註</label>
+                    <textarea id="note" rows="3"
+                              class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              placeholder="請輸入備註（選填）"></textarea>
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeModal()"
+                            class="px-4 py-2 border rounded-lg hover:bg-gray-100">取消</button>
+                    <button type="submit"
+                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">儲存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 資料儲存
+        let orders = JSON.parse(localStorage.getItem('productionOrders') || '[]');
+        let currentDate = new Date();
+        let currentView = 'calendar';
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            renderCalendar();
+            updateStats();
+            renderList();
+            renderStats();
+        });
+
+        // 切換視圖
+        function changeView(view) {
+            currentView = view;
+            document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`view-${view}`).classList.remove('hidden');
+            
+            document.querySelectorAll('[id^="btn-"]').forEach(el => {
+                el.classList.remove('bg-blue-700');
+            });
+            document.getElementById(`btn-${view}`).classList.add('bg-blue-700');
+        }
+
+        // 渲染日曆
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            document.getElementById('current-month').textContent = 
+                `${year}年 ${month + 1}月`;
+            
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            const calendarBody = document.getElementById('calendar-body');
+            calendarBody.innerHTML = '';
+            
+            // 空白格子
+            for (let i = 0; i < firstDay; i++) {
+                calendarBody.innerHTML += '<div class="calendar-day bg-gray-50"></div>';
+            }
+            
+            // 日期格子
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayOrders = orders.filter(o => o.date === dateStr);
+                
+                let ordersHtml = dayOrders.map(o => {
+                    const statusClass = `status-${o.status}`;
+                    return `<div class="schedule-item ${statusClass}" onclick="editOrder('${o.id}')">
+                        <div class="font-semibold">${o.orderNo}</div>
+                        <div class="text-xs">${o.productName}</div>
+                    </div>`;
+                }).join('');
+                
+                calendarBody.innerHTML += `
+                    <div class="calendar-day">
+                        <div class="font-semibold text-gray-700 mb-1">${day}</div>
+                        ${ordersHtml}
+                    </div>
+                `;
+            }
+        }
+
+        // 切換月份
+        function changeMonth(delta) {
+            currentDate.setMonth(currentDate.getMonth() + delta);
+            renderCalendar();
+        }
+
+        // 更新統計
+        function updateStats() {
+            const thisMonth = orders.filter(o => {
+                const orderDate = new Date(o.date);
+                return orderDate.getMonth() === currentDate.getMonth() && 
+                       orderDate.getFullYear() === currentDate.getFullYear();
+            });
+            
+            document.getElementById('stat-total').textContent = thisMonth.length;
+            document.getElementById('stat-pending').textContent = 
+                thisMonth.filter(o => o.status === 'pending').length;
+            document.getElementById('stat-progress').textContent = 
+                thisMonth.filter(o => o.status === 'progress').length;
+            document.getElementById('stat-complete').textContent = 
+                thisMonth.filter(o => o.status === 'complete').length;
+        }
+
+        // 渲染列表
+        function renderList() {
+            const tbody = document.getElementById('list-body');
+            
+            if (orders.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center py-8 text-gray-500">尚無工單資料</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            const sortedOrders = [...orders].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            tbody.innerHTML = sortedOrders.map(o => {
+                const statusText = { pending: '待產', progress: '生產中', complete: '已完成' };
+                const statusColor = { pending: 'text-yellow-600', progress: 'text-blue-600', complete: 'text-green-600' };
+                
+                return `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="px-4 py-3">${o.orderNo}</td>
+                        <td class="px-4 py-3">${o.date}</td>
+                        <td class="px-4 py-3">${o.productName}</td>
+                        <td class="px-4 py-3">${o.quantity}</td>
+                        <td class="px-4 py-3">${o.productionLine}</td>
+                        <td class="px-4 py-3 ${statusColor[o.status]}">${statusText[o.status]}</td>
+                        <td class="px-4 py-3">
+                            <button onclick="editOrder('${o.id}')" class="text-blue-600 hover:text-blue-800 mr-3">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteOrder('${o.id}')" class="text-red-600 hover:text-red-800">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // 搜尋
+        function searchOrders() {
+            const keyword = document.getElementById('search-input').value.toLowerCase();
+            const rows = document.querySelectorAll('#list-body tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(keyword) ? '' : 'none';
+            });
+        }
+
+        // 渲染統計
+        function renderStats() {
+            // 產線統計
+            const lineStats = {};
+            orders.forEach(o => {
+                lineStats[o.productionLine] = (lineStats[o.productionLine] || 0) + parseInt(o.quantity);
+            });
+            
+            const lineChart = document.getElementById('line-chart');
+            const maxQty = Math.max(...Object.values(lineStats), 1);
+            
+            lineChart.innerHTML = Object.entries(lineStats).map(([line, qty]) => {
+                const percentage = (qty / maxQty) * 100;
+                return `
+                    <div class="flex items-center">
+                        <div class="w-16 text-sm">${line}</div>
+                        <div class="flex-1 bg-gray-200 rounded-full h-6">
+                            <div class="bg-blue-600 h-6 rounded-full flex items-center justify-end pr-2 text-white text-xs"
+                                 style="width: ${percentage}%">
+                                ${qty}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('') || '<div class="text-gray-500 text-center">尚無資料</div>';
+            
+            // 狀態統計
+            const statusStats = { pending: 0, progress: 0, complete: 0 };
+            orders.forEach(o => statusStats[o.status]++);
+            
+            const total = orders.length || 1;
+            document.getElementById('status-pie').innerHTML = `
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-yellow-600">● 待產</span>
+                        <span>${Math.round(statusStats.pending/total*100)}% (${statusStats.pending})</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-blue-600">● 生產中</span>
+                        <span>${Math.round(statusStats.progress/total*100)}% (${statusStats.progress})</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-green-600">● 已完成</span>
+                        <span>${Math.round(statusStats.complete/total*100)}% (${statusStats.complete})</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Modal 控制
+        function openModal() {
+            document.getElementById('modal').classList.add('active');
+            document.getElementById('orderForm').reset();
+            document.getElementById('orderId').value = '';
+            document.getElementById('modal-title').textContent = '新增工單';
+            document.getElementById('orderDate').value = new Date().toISOString().split('T')[0];
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        // 編輯工單
+        function editOrder(id) {
+            const order = orders.find(o => o.id === id);
+            if (!order) return;
+            
+            document.getElementById('modal').classList.add('active');
+            document.getElementById('orderId').value = order.id;
+            document.getElementById('orderNo').value = order.orderNo;
+            document.getElementById('orderDate').value = order.date;
+            document.getElementById('productName').value = order.productName;
+            document.getElementById('quantity').value = order.quantity;
+            document.getElementById('productionLine').value = order.productionLine;
+            document.getElementById('status').value = order.status;
+            document.getElementById('note').value = order.note || '';
+            document.getElementById('modal-title').textContent = '編輯工單';
+        }
+
+        // 刪除工單
+        function deleteOrder(id) {
+            if (!confirm('確定要刪除這筆工單嗎？')) return;
+            
+            orders = orders.filter(o => o.id !== id);
+            localStorage.setItem('productionOrders', JSON.stringify(orders));
+            
+            renderCalendar();
+            updateStats();
+            renderList();
+            renderStats();
+        }
+
+        // 表單提交
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('orderId').value;
+            const orderData = {
+                id: id || Date.now().toString(),
+                orderNo: document.getElementById('orderNo').value,
+                date: document.getElementById('orderDate').value,
+                productName: document.getElementById('productName').value,
+                quantity: document.getElementById('quantity').value,
+                productionLine: document.getElementById('productionLine').value,
+                status: document.getElementById('status').value,
+                note: document.getElementById('note').value
+            };
+            
+            if (id) {
+                const index = orders.findIndex(o => o.id === id);
+                if (index !== -1) orders[index] = orderData;
+            } else {
+                orders.push(orderData);
+            }
+            
+            localStorage.setItem('productionOrders', JSON.stringify(orders));
+            closeModal();
+            
+            renderCalendar();
+            updateStats();
+            renderList();
+            renderStats();
+        });
+
+        // 點擊 modal 外部關閉
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+    </script>
+</body>
+</html>
