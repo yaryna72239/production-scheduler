@@ -404,7 +404,7 @@
             document.getElementById('editModal').classList.remove('active');
         }
 
-        // 儲存專案編輯 - 更新多個資料表
+        // 儲存專案編輯 - 更新多個資料表（修正版：移除不存在的 updated_at 欄位）
         async function saveProjectEdit() {
             const id = document.getElementById('editProjectId').value;
             const project = projects.find(p => p.id === id);
@@ -440,8 +440,7 @@
                         .from('orders')
                         .update({
                             quantity: newQuantity,
-                            deadline: newDeliveryDate,
-                            updated_at: new Date().toISOString()
+                            deadline: newDeliveryDate
                         })
                         .eq('id', project.orderId);
                     
@@ -456,8 +455,7 @@
                             .from('customers')
                             .update({
                                 name: newClient,
-                                contact_person: newContact,
-                                updated_at: new Date().toISOString()
+                                contact_person: newContact
                             })
                             .eq('id', project.customerId);
                         
@@ -472,8 +470,7 @@
                         const { error: productError } = await supabaseClient
                             .from('products')
                             .update({
-                                name: newName,
-                                updated_at: new Date().toISOString()
+                                name: newName
                             })
                             .eq('id', project.productId);
                         
