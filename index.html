@@ -85,36 +85,6 @@
         .priority-medium { background: #fef3c7; color: #d97706; }
         .priority-low { background: #d1fae5; color: #059669; }
         
-        /* 負責人頭像 */
-        .avatar { display: inline-flex; align-items: center; gap: 8px; }
-        .avatar-img { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; }
-        .avatar-name { font-size: 14px; color: var(--text); }
-        
-        /* 操作按鈕 */
-        .btn-action { padding: 8px 16px; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-        .btn-edit { background: var(--primary); color: white; }
-        .btn-edit:hover { background: var(--primary-dark); }
-        
-        /* Checkbox */
-        .checkbox { width: 18px; height: 18px; border: 2px solid var(--border); border-radius: 4px; cursor: pointer; }
-        
-        /* Modal Styles */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-overlay.active { display: flex; }
-        .modal { background: white; border-radius: 16px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-        .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--border); }
-        .modal-title { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-        .btn-close { width: 32px; height: 32px; border: none; background: #f1f5f9; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); }
-        .modal-body { padding: 24px; }
-        .form-group { margin-bottom: 20px; }
-        .form-label { display: block; font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
-        .form-input { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; }
-        .form-input:focus { outline: none; border-color: var(--primary); }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        .modal-footer { display: flex; gap: 12px; padding: 20px 24px; border-top: 1px solid var(--border); }
-        .btn-cancel { flex: 1; padding: 12px 24px; border: 1px solid var(--border); background: white; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; }
-        .btn-save { flex: 1; padding: 12px 24px; border: none; background: var(--primary); border-radius: 10px; font-size: 14px; font-weight: 600; color: white; cursor: pointer; }
-        
         /* Status message */
         .status-msg { position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; z-index: 2000; }
         .status-msg.success { background: #22c55e; color: white; }
@@ -169,18 +139,16 @@
                 <table>
                     <thead>
                         <tr>
-                            <th style="width: 40px;"><input type="checkbox" class="checkbox"></th>
-                            <th>序號</th>
-                            <th>工單編號</th>
-                            <th>產品名稱</th>
-                            <th>產線</th>
-                            <th>狀態</th>
-                            <th>優先級</th>
-                            <th>開始日期</th>
-                            <th>結束日期</th>
-                            <th>數量</th>
+                            <th>項次</th>
+                            <th>階段狀態</th>
                             <th>負責人</th>
-                            <th>操作</th>
+                            <th>廠商</th>
+                            <th>提案進度</th>
+                            <th>工作日曆天數</th>
+                            <th>起始日期</th>
+                            <th>結束日期</th>
+                            <th>運送天數</th>
+                            <th>備註</th>
                         </tr>
                     </thead>
                     <tbody id="workorderTableBody">
@@ -200,11 +168,11 @@
         let projects = [];
         let currentProject = null;
 
-        // 測試工單資料
+        // 測試工單資料 - 符合新欄位順序
         let workorders = [
-            { id: 1, woNo: 'WO-202403-001', product: '20寸行李箱外殼', line: 'A線', status: '待產', priority: 'high', startDate: '2024-03-20', endDate: '2024-03-24', quantity: 2000, owner: '李明達' },
-            { id: 2, woNo: 'WO-202403-002', product: '28寸行李箱外殼', line: 'B線', status: '待產', priority: 'high', startDate: '2024-03-25', endDate: '2024-03-28', quantity: 1500, owner: '李思涵' },
-            { id: 3, woNo: 'WO-202403-003', product: 'Logo印刷-熱轉印', line: 'C線', status: '待產', priority: 'medium', startDate: '2024-03-26', endDate: '2024-03-29', quantity: 3500, owner: '王建國' }
+            { id: 1, stageStatus: '提案中', owner: '李明達', vendor: '高柏科技', progress: 30, workDays: 5, startDate: '2024-03-20', endDate: '2024-03-24', shippingDays: 2, notes: '需確認Logo設計' },
+            { id: 2, stageStatus: '報價中', owner: '李思涵', vendor: '創新科技', progress: 50, workDays: 4, startDate: '2024-03-25', endDate: '2024-03-28', shippingDays: 1, notes: '待客戶確認' },
+            { id: 3, stageStatus: '生產中', owner: '王建國', vendor: '數位生活', progress: 75, workDays: 3, startDate: '2024-03-26', endDate: '2024-03-29', shippingDays: 2, notes: '' }
         ];
 
         function initSupabase() {
@@ -224,7 +192,6 @@
         async function loadFromSupabase() {
             if (!supabaseClient) {
                 if (!initSupabase()) {
-                    // 使用測試資料
                     projects = [
                         { id: 'A0010-260317', name: '20寸/28寸行李箱+logo印刷', client: '高柏科技', contact: 'Joanne', progress: 30, startDate: '2026-03-30', totalQuantity: 7000, deliveryDate: '2025-04-15' },
                         { id: 'A0011-260318', name: '鋁合金手機支架', client: '創新科技', contact: 'Alex', progress: 25, startDate: '2026-03-30', totalQuantity: 5000, deliveryDate: '2025-04-10' },
@@ -263,7 +230,6 @@
                 
             } catch (error) {
                 console.error('載入資料失敗:', error);
-                // 使用測試資料
                 projects = [
                     { id: 'A0010-260317', name: '20寸/28寸行李箱+logo印刷', client: '高柏科技', contact: 'Joanne', progress: 30, startDate: '2026-03-30', totalQuantity: 7000, deliveryDate: '2025-04-15' },
                     { id: 'A0011-260318', name: '鋁合金手機支架', client: '創新科技', contact: 'Alex', progress: 25, startDate: '2026-03-30', totalQuantity: 5000, deliveryDate: '2025-04-10' },
@@ -330,14 +296,11 @@
             currentProject = projects.find(p => p.id === id);
             if (!currentProject) return;
             
-            // 更新工單頁面標題
             document.getElementById('woProjectTitle').textContent = currentProject.name;
             document.getElementById('woProjectInfo').textContent = `${currentProject.client} / ${currentProject.contact}`;
             
-            // 渲染工單表格
             renderWorkorders();
             
-            // 切換到工單頁面
             document.getElementById('mainView').style.display = 'none';
             document.getElementById('workorderView').classList.add('active');
         }
@@ -349,58 +312,40 @@
             currentProject = null;
         }
 
-        // 渲染工單表格
+        // 渲染工單表格 - 新欄位順序
         function renderWorkorders() {
             const tbody = document.getElementById('workorderTableBody');
             
             tbody.innerHTML = workorders.map((wo, index) => {
-                const statusBadge = getStatusBadge(wo.status);
-                const priorityBadge = getPriorityBadge(wo.priority);
-                const avatarInitial = wo.owner ? wo.owner.charAt(0) : '?';
+                const statusBadge = getStageStatusBadge(wo.stageStatus);
                 
                 return `
                 <tr>
-                    <td><input type="checkbox" class="checkbox"></td>
                     <td>${index + 1}</td>
-                    <td><strong>${wo.woNo}</strong></td>
-                    <td>${wo.product}</td>
-                    <td>${wo.line}</td>
                     <td>${statusBadge}</td>
-                    <td>${priorityBadge}</td>
+                    <td>${wo.owner}</td>
+                    <td>${wo.vendor}</td>
+                    <td>${wo.progress}%</td>
+                    <td>${wo.workDays}</td>
                     <td>${wo.startDate}</td>
                     <td>${wo.endDate}</td>
-                    <td>${wo.quantity.toLocaleString()}</td>
-                    <td>
-                        <div class="avatar">
-                            <div class="avatar-img">${avatarInitial}</div>
-                            <span class="avatar-name">${wo.owner}</span>
-                        </div>
-                    </td>
-                    <td><button class="btn-action btn-edit">編輯</button></td>
+                    <td>${wo.shippingDays}</td>
+                    <td>${wo.notes || '-'}</td>
                 </tr>
                 `;
             }).join('');
         }
 
-        // 取得狀態標籤
-        function getStatusBadge(status) {
+        // 取得階段狀態標籤
+        function getStageStatusBadge(status) {
             const statusMap = {
-                '待產': '<span class="badge badge-yellow"><i class="fas fa-clock"></i> 待產</span>',
+                '提案中': '<span class="badge badge-yellow"><i class="fas fa-lightbulb"></i> 提案中</span>',
+                '報價中': '<span class="badge badge-blue"><i class="fas fa-file-invoice-dollar"></i> 報價中</span>',
+                '待產': '<span class="badge badge-gray"><i class="fas fa-clock"></i> 待產</span>',
                 '生產中': '<span class="badge badge-blue"><i class="fas fa-spinner"></i> 生產中</span>',
-                '已完成': '<span class="badge badge-green"><i class="fas fa-check"></i> 已完成</span>',
-                '已暫停': '<span class="badge badge-gray"><i class="fas fa-pause"></i> 已暫停</span>'
+                '已完成': '<span class="badge badge-green"><i class="fas fa-check"></i> 已完成</span>'
             };
             return statusMap[status] || `<span class="badge badge-gray">${status}</span>`;
-        }
-
-        // 取得優先級標籤
-        function getPriorityBadge(priority) {
-            const priorityMap = {
-                'high': '<span class="priority priority-high">高</span>',
-                'medium': '<span class="priority priority-medium">中</span>',
-                'low': '<span class="priority priority-low">低</span>'
-            };
-            return priorityMap[priority] || priority;
         }
 
         // 新增工單
