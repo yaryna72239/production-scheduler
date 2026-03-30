@@ -1,3 +1,18 @@
-title: 生產排程管理系ystem
+# GitHub Pages Configuration
+title: 生產排程管理系統
 description: 專案管理與生產排程系統
-theme: minima
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+
+# Exclude files
+exclude:
+  - node_modules
+  - src
+  - package.json
+  - README.md
+
+# Include files
+include:
+  - index.html
