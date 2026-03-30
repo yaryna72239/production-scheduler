@@ -79,7 +79,7 @@
         .badge-blue { background: #dbeafe; color: #1e40af; }
         .badge-gray { background: #f3f4f6; color: #4b5563; }
         
-        /* Modal Styles - 符合圖片樣式 */
+        /* Modal Styles */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
         .modal-overlay.active { display: flex; }
         .modal { background: white; border-radius: 16px; width: 90%; max-width: 480px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px rgba(0,0,0,0.25); }
@@ -176,7 +176,7 @@
         </div>
     </div>
 
-    <!-- 編輯專案 Modal - 符合圖片樣式 -->
+    <!-- 編輯專案 Modal -->
     <div class="modal-overlay" id="editModal">
         <div class="modal">
             <div class="modal-header">
@@ -189,14 +189,11 @@
             
             <div class="modal-body">
                 <input type="hidden" id="editProjectId">
-                
-                <!-- 案名 -->
                 <div class="form-group">
                     <label class="form-label">案名</label>
                     <input type="text" class="form-input" id="editName" placeholder="輸入案名">
                 </div>
                 
-                <!-- 聯絡人公司和姓名 - 兩欄並排 -->
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">聯絡人公司</label>
@@ -208,7 +205,6 @@
                     </div>
                 </div>
                 
-                <!-- 開始日期和交期 - 兩欄並排 -->
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">開始日期</label>
@@ -220,7 +216,6 @@
                     </div>
                 </div>
                 
-                <!-- 數量 -->
                 <div class="form-group">
                     <label class="form-label">數量</label>
                     <input type="number" class="form-input" id="editQuantity" placeholder="輸入數量">
@@ -270,6 +265,7 @@
         async function loadFromSupabase() {
             if (!supabaseClient) {
                 if (!initSupabase()) {
+                    console.log('Supabase 未初始化，使用靜態資料');
                     projects = [
                         { id: 'A0010-260317', name: '20寸/28寸行李箱+logo印刷', client: '高柏科技', contact: 'Joanne', progress: 30, startDate: '2026-03-30', totalQuantity: 7000, deliveryDate: '2025-04-15' },
                         { id: 'A0011-260318', name: '鋁合金手機支架', client: '創新科技', contact: 'Alex', progress: 25, startDate: '2026-03-30', totalQuantity: 5000, deliveryDate: '2025-04-10' },
@@ -291,23 +287,33 @@
                 
                 if (ordersError) throw ordersError;
                 
-                projects = (ordersData || []).map(order => ({
-                    orderId: order.id,
-                    id: order.order_no,
-                    name: order.product_name || '未命名產品',
-                    client: order.customer_name || '未知客戶',
-                    contact: order.contact_person || '',
-                    progress: order.customer_progress || 0,
-                    startDate: order.created_at ? order.created_at.split('T')[0] : '',
-                    totalQuantity: order.quantity || 0,
-                    deliveryDate: order.deadline || ''
-                }));
+                if (ordersData && ordersData.length > 0) {
+                    projects = ordersData.map(order => ({
+                        orderId: order.id,
+                        id: order.order_no,
+                        name: order.product_name || '未命名產品',
+                        client: order.customer_name || '未知客戶',
+                        contact: order.contact_person || '',
+                        progress: order.customer_progress || 0,
+                        startDate: order.created_at ? order.created_at.split('T')[0] : '',
+                        totalQuantity: order.quantity || 0,
+                        deliveryDate: order.deadline || ''
+                    }));
+                } else {
+                    // 如果 Supabase 沒有資料，使用靜態資料
+                    projects = [
+                        { id: 'A0010-260317', name: '20寸/28寸行李箱+logo印刷', client: '高柏科技', contact: 'Joanne', progress: 30, startDate: '2026-03-30', totalQuantity: 7000, deliveryDate: '2025-04-15' },
+                        { id: 'A0011-260318', name: '鋁合金手機支架', client: '創新科技', contact: 'Alex', progress: 25, startDate: '2026-03-30', totalQuantity: 5000, deliveryDate: '2025-04-10' },
+                        { id: 'A0012-260319', name: 'USB-C 充電線組', client: '數位生活', contact: '小陳', progress: 60, startDate: '2026-03-30', totalQuantity: 20000, deliveryDate: '2025-04-20' }
+                    ];
+                }
                 
                 renderProjects();
                 updateLastModifiedTime();
                 
             } catch (error) {
                 console.error('載入資料失敗:', error);
+                // 使用靜態資料
                 projects = [
                     { id: 'A0010-260317', name: '20寸/28寸行李箱+logo印刷', client: '高柏科技', contact: 'Joanne', progress: 30, startDate: '2026-03-30', totalQuantity: 7000, deliveryDate: '2025-04-15' },
                     { id: 'A0011-260318', name: '鋁合金手機支架', client: '創新科技', contact: 'Alex', progress: 25, startDate: '2026-03-30', totalQuantity: 5000, deliveryDate: '2025-04-10' },
@@ -375,12 +381,12 @@
             if (!project) return;
             
             document.getElementById('editProjectId').value = id;
-            document.getElementById('editName').value = project.name;
-            document.getElementById('editClient').value = project.client;
-            document.getElementById('editContact').value = project.contact;
-            document.getElementById('editStartDate').value = project.startDate;
-            document.getElementById('editDeliveryDate').value = project.deliveryDate;
-            document.getElementById('editQuantity').value = project.totalQuantity;
+            document.getElementById('editName').value = project.name || '';
+            document.getElementById('editClient').value = project.client || '';
+            document.getElementById('editContact').value = project.contact || '';
+            document.getElementById('editStartDate').value = project.startDate || '';
+            document.getElementById('editDeliveryDate').value = project.deliveryDate || '';
+            document.getElementById('editQuantity').value = project.totalQuantity || '';
             
             document.getElementById('editModal').classList.add('active');
         }
@@ -390,7 +396,7 @@
             document.getElementById('editModal').classList.remove('active');
         }
 
-        // 儲存專案編輯
+        // 儲存專案編輯 - 修正版：儲存所有欄位到 Supabase
         async function saveProjectEdit() {
             const id = document.getElementById('editProjectId').value;
             const project = projects.find(p => p.id === id);
@@ -401,32 +407,53 @@
             saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 儲存中...';
             
             try {
-                // 更新本地資料
-                project.name = document.getElementById('editName').value;
-                project.client = document.getElementById('editClient').value;
-                project.contact = document.getElementById('editContact').value;
-                project.startDate = document.getElementById('editStartDate').value;
-                project.deliveryDate = document.getElementById('editDeliveryDate').value;
-                project.totalQuantity = parseInt(document.getElementById('editQuantity').value) || 0;
+                // 取得表單資料
+                const newName = document.getElementById('editName').value;
+                const newClient = document.getElementById('editClient').value;
+                const newContact = document.getElementById('editContact').value;
+                const newStartDate = document.getElementById('editStartDate').value;
+                const newDeliveryDate = document.getElementById('editDeliveryDate').value;
+                const newQuantity = parseInt(document.getElementById('editQuantity').value) || 0;
                 
-                // 如果有 Supabase，同步更新
+                // 更新本地資料
+                project.name = newName;
+                project.client = newClient;
+                project.contact = newContact;
+                project.startDate = newStartDate;
+                project.deliveryDate = newDeliveryDate;
+                project.totalQuantity = newQuantity;
+                
+                // 儲存到 Supabase
                 if (supabaseClient && project.orderId) {
+                    console.log('正在儲存到 Supabase...', project.orderId);
+                    
                     const { error } = await supabaseClient
                         .from('orders')
                         .update({
-                            quantity: project.totalQuantity,
-                            deadline: project.deliveryDate,
+                            product_name: newName,
+                            customer_name: newClient,
+                            contact_person: newContact,
+                            quantity: newQuantity,
+                            deadline: newDeliveryDate,
                             updated_at: new Date().toISOString()
                         })
                         .eq('id', project.orderId);
                     
-                    if (error) throw error;
+                    if (error) {
+                        console.error('Supabase 儲存錯誤:', error);
+                        throw error;
+                    }
+                    
+                    console.log('Supabase 儲存成功');
+                    showStatus('資料已儲存到資料庫', 'success');
+                } else {
+                    console.log('Supabase 未連線，僅更新本地資料');
+                    showStatus('資料已更新（本地模式）', 'success');
                 }
                 
                 renderProjects();
                 closeEditModal();
                 updateLastModifiedTime();
-                showStatus('資料已儲存', 'success');
                 
             } catch (error) {
                 console.error('儲存失敗:', error);
