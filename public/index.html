@@ -3,124 +3,504 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRM 生產排程管理系統</title>
+    <title>生產排程管理系統</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f8f9fa;
-            --bg-hover: #f1f3f4;
-            --border: #e0e0e0;
-            --border-light: #f0f0f0;
-            --text-primary: #202124;
-            --text-secondary: #5f6368;
-            --text-muted: #9aa0a6;
-            --blue: #1a73e8;
-            --blue-light: #e8f0fe;
-            --green: #34a853;
-            --green-light: #e6f4ea;
-            --yellow: #fbbc04;
-            --yellow-light: #fef3e8;
-            --orange: #f9ab00;
-            --orange-light: #fff3e0;
-            --red: #ea4335;
-            --red-light: #fce8e6;
-            --purple: #9c27b0;
-            --purple-light: #f3e5f5;
-            --cyan: #00bcd4;
-            --cyan-light: #e0f7fa;
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #e0e7ff;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --purple: #8b5cf6;
+            --orange: #f97316;
+            --bg: #f8fafc;
+            --bg-card: #ffffff;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
         }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
+            background: var(--bg);
+            color: var(--text);
             font-size: 14px;
             line-height: 1.5;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
         }
 
-        /* App Container */
-        .app {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px 24px;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
         }
 
-        /* Top Navigation */
-        .top-nav {
+        .header-top {
             display: flex;
             align-items: center;
-            padding: 8px 16px;
-            background: var(--bg-primary);
-            border-bottom: 1px solid var(--border);
-            gap: 8px;
+            justify-content: space-between;
+            margin-bottom: 16px;
         }
 
-        .nav-tabs {
+        .logo {
             display: flex;
             align-items: center;
-            gap: 4px;
-            flex: 1;
+            gap: 12px;
+            color: white;
         }
 
-        .nav-tab {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            color: var(--text-secondary);
-            font-size: 13px;
-            font-weight: 500;
-            transition: all 0.2s;
-            border: none;
-            background: transparent;
-        }
-
-        .nav-tab:hover {
-            background: var(--bg-hover);
-            color: var(--text-primary);
-        }
-
-        .nav-tab.active {
-            background: var(--blue-light);
-            color: var(--blue);
-        }
-
-        .nav-tab i {
-            font-size: 14px;
-        }
-
-        .add-tab {
-            width: 32px;
-            height: 32px;
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 6px;
-            cursor: pointer;
-            color: var(--text-secondary);
-            transition: all 0.2s;
+            font-size: 20px;
         }
 
-        .add-tab:hover {
-            background: var(--bg-hover);
-            color: var(--text-primary);
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-header {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-header.secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .btn-header.secondary:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .btn-header.primary {
+            background: #22c55e;
+            color: white;
+        }
+
+        .btn-header.primary:hover {
+            background: #16a34a;
+            transform: translateY(-2px);
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+            color: white;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .stat-badge i {
+            font-size: 10px;
+        }
+
+        .stat-badge.urgent i { color: #fecaca; }
+        .stat-badge.processing i { color: #fde68a; }
+        .stat-badge.quote i { color: #bfdbfe; }
+        .stat-badge.sample i { color: #fed7aa; }
+        .stat-badge.done i { color: #bbf7d0; }
+
+        .update-time {
+            margin-left: auto;
+            color: rgba(255,255,255,0.8);
+            font-size: 12px;
+        }
+
+        /* Search Bar */
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 16px;
+            background: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .search-input i {
+            color: var(--text-secondary);
+        }
+
+        .search-input input {
+            border: none;
+            outline: none;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .btn-search {
+            padding: 12px 24px;
+            background: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-clear {
+            padding: 12px 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* Phase Tabs */
+        .phase-tabs {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .phase-tab {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .phase-tab:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .phase-tab.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .phase-tab i {
+            font-size: 16px;
+        }
+
+        .phase-divider {
+            width: 1px;
+            height: 24px;
+            background: var(--border);
+            margin: 0 8px;
+        }
+
+        /* Section Title */
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+
+        .section-title i {
+            color: var(--warning);
+        }
+
+        /* Project Cards Grid */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 20px;
+        }
+
+        .project-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--warning);
+        }
+
+        .project-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .project-id {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-family: monospace;
+        }
+
+        .project-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #fef3c7;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #92400e;
+        }
+
+        .project-status i {
+            font-size: 10px;
+        }
+
+        .project-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .project-client {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .project-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), #4ade80);
+            border-radius: 3px;
+            transition: width 0.5s;
+        }
+
+        .progress-text {
+            text-align: right;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-card {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-card.success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-card.success:hover {
+            background: #16a34a;
+        }
+
+        .btn-card.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .btn-card.warning:hover {
+            background: #fde68a;
+        }
+
+        /* Project Detail View (Hidden by default) */
+        .detail-view {
+            display: none;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .detail-view.active {
+            display: block;
+        }
+
+        .detail-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .detail-title {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-back {
+            padding: 10px 20px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-back:hover {
+            background: var(--border);
+        }
+
+        /* Tabs in Detail View */
+        .detail-tabs {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .detail-tab {
+            padding: 16px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .detail-tab:hover {
+            color: var(--primary);
+        }
+
+        .detail-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
         }
 
         /* Toolbar */
-        .toolbar {
+        .detail-toolbar {
             display: flex;
             align-items: center;
-            padding: 8px 16px;
+            padding: 12px 24px;
             gap: 8px;
-            border-bottom: 1px solid var(--border-light);
+            border-bottom: 1px solid var(--border);
         }
 
         .toolbar-btn {
@@ -129,7 +509,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             color: var(--text-secondary);
             background: transparent;
@@ -139,8 +519,8 @@
         }
 
         .toolbar-btn:hover {
-            background: var(--bg-hover);
-            color: var(--text-primary);
+            background: var(--bg);
+            color: var(--text);
         }
 
         .toolbar-divider {
@@ -148,42 +528,6 @@
             height: 24px;
             background: var(--border);
             margin: 0 4px;
-        }
-
-        .search-box {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            background: var(--bg-secondary);
-            border-radius: 6px;
-            margin-left: auto;
-            min-width: 240px;
-        }
-
-        .search-box i {
-            color: var(--text-muted);
-            font-size: 14px;
-        }
-
-        .search-box input {
-            border: none;
-            background: transparent;
-            outline: none;
-            font-size: 13px;
-            color: var(--text-primary);
-            width: 100%;
-        }
-
-        .search-box input::placeholder {
-            color: var(--text-muted);
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            overflow: auto;
-            background: var(--bg-primary);
         }
 
         /* Table */
@@ -195,42 +539,140 @@
 
         .data-table th {
             text-align: left;
-            padding: 12px 16px;
+            padding: 14px 16px;
             font-weight: 600;
             color: var(--text-secondary);
             border-bottom: 1px solid var(--border);
-            background: var(--bg-primary);
-            position: sticky;
-            top: 0;
-            z-index: 10;
+            background: white;
             white-space: nowrap;
         }
 
         .data-table th i {
             margin-right: 6px;
-            font-size: 12px;
         }
 
         .data-table td {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border-light);
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
             vertical-align: middle;
         }
 
         .data-table tr:hover td {
-            background: var(--bg-hover);
+            background: #f8fafc;
         }
 
-        .data-table tr.selected td {
-            background: var(--blue-light);
-        }
-
-        /* Row Number */
-        .row-num {
-            color: var(--text-muted);
+        /* Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
             font-size: 12px;
-            width: 40px;
-            text-align: center;
+            font-weight: 600;
+        }
+
+        .status-done {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-progress {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-hold {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Priority */
+        .priority {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .priority-high {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .priority-medium {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .priority-low {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        /* Avatar */
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .avatar.blue { background: #3b82f6; }
+        .avatar.green { background: #22c55e; }
+        .avatar.purple { background: #8b5cf6; }
+        .avatar.orange { background: #f97316; }
+
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Action Button */
+        .btn-action {
+            padding: 8px 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-action:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Add Row */
+        .add-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .add-row:hover {
+            background: #f8fafc;
+            color: var(--primary);
         }
 
         /* Checkbox */
@@ -238,7 +680,7 @@
             width: 18px;
             height: 18px;
             border: 2px solid var(--border);
-            border-radius: 3px;
+            border-radius: 4px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -247,455 +689,177 @@
         }
 
         .checkbox:hover {
-            border-color: var(--blue);
+            border-color: var(--primary);
         }
 
         .checkbox.checked {
-            background: var(--blue);
-            border-color: var(--blue);
+            background: var(--primary);
+            border-color: var(--primary);
             color: white;
-        }
-
-        /* Cell Content */
-        .cell-text {
-            color: var(--text-primary);
-        }
-
-        .cell-link {
-            color: var(--blue);
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .cell-link:hover {
-            text-decoration: underline;
-        }
-
-        /* Status Badges */
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 12px;
-            border-radius: 16px;
-            font-size: 12px;
-            font-weight: 500;
-            white-space: nowrap;
-        }
-
-        .status-badge::before {
-            content: '';
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-        }
-
-        .status-done {
-            background: var(--green-light);
-            color: var(--green);
-        }
-
-        .status-done::before {
-            background: var(--green);
-        }
-
-        .status-progress {
-            background: var(--blue-light);
-            color: var(--blue);
-        }
-
-        .status-progress::before {
-            background: var(--blue);
-        }
-
-        .status-pending {
-            background: var(--yellow-light);
-            color: #b06000;
-        }
-
-        .status-pending::before {
-            background: var(--yellow);
-        }
-
-        .status-new {
-            background: var(--cyan-light);
-            color: #00838f;
-        }
-
-        .status-new::before {
-            background: var(--cyan);
-        }
-
-        .status-hold {
-            background: var(--orange-light);
-            color: #e65100;
-        }
-
-        .status-hold::before {
-            background: var(--orange);
-        }
-
-        .status-cancel {
-            background: var(--red-light);
-            color: var(--red);
-        }
-
-        .status-cancel::before {
-            background: var(--red);
-        }
-
-        /* Action Buttons */
-        .btn-action {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 500;
-            cursor: pointer;
-            border: none;
-            transition: all 0.2s;
-        }
-
-        .btn-primary {
-            background: var(--blue);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #1557b0;
-            box-shadow: 0 2px 8px rgba(26, 115, 232, 0.3);
-        }
-
-        .btn-secondary {
-            background: var(--bg-secondary);
-            color: var(--text-secondary);
-            border: 1px solid var(--border);
-        }
-
-        .btn-secondary:hover {
-            background: var(--bg-hover);
-            color: var(--text-primary);
-        }
-
-        /* Priority Tags */
-        .priority-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .priority-high {
-            background: var(--red-light);
-            color: var(--red);
-        }
-
-        .priority-medium {
-            background: var(--yellow-light);
-            color: #b06000;
-        }
-
-        .priority-low {
-            background: var(--green-light);
-            color: var(--green);
-        }
-
-        /* Avatar */
-        .avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--blue);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        /* Bottom Bar */
-        .bottom-bar {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            border-top: 1px solid var(--border);
-            background: var(--bg-primary);
-            gap: 16px;
-        }
-
-        .stats {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .stat-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-        }
-
-        .pagination {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-left: auto;
-        }
-
-        .page-btn {
-            padding: 6px 12px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            background: var(--bg-primary);
-            color: var(--text-secondary);
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .page-btn:hover {
-            background: var(--bg-hover);
-            color: var(--text-primary);
-        }
-
-        .page-btn.active {
-            background: var(--blue);
-            color: white;
-            border-color: var(--blue);
-        }
-
-        /* Add Row Button */
-        .add-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 16px;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: all 0.2s;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .add-row:hover {
-            background: var(--bg-hover);
-            color: var(--text-primary);
-        }
-
-        /* Modal */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        .modal {
-            background: var(--bg-primary);
-            border-radius: 12px;
-            width: 90%;
-            max-width: 600px;
-            max-height: 90vh;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-        }
-
-        .modal-header {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .modal-title {
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .modal-close {
-            width: 32px;
-            height: 32px;
-            border: none;
-            background: transparent;
-            border-radius: 6px;
-            cursor: pointer;
-            color: var(--text-muted);
-            font-size: 18px;
-        }
-
-        .modal-close:hover {
-            background: var(--bg-hover);
-            color: var(--text-primary);
-        }
-
-        .modal-body {
-            padding: 24px;
-            overflow-y: auto;
-            max-height: calc(90vh - 140px);
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .form-input, .form-select, .form-textarea {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 14px;
-            transition: all 0.2s;
-            background: var(--bg-primary);
-        }
-
-        .form-input:focus, .form-select:focus, .form-textarea:focus {
-            outline: none;
-            border-color: var(--blue);
-            box-shadow: 0 0 0 3px var(--blue-light);
-        }
-
-        .modal-footer {
-            padding: 16px 24px;
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--text-muted);
         }
     </style>
 </head>
 <body>
-    <div class="app">
-        <!-- Top Navigation -->
-        <nav class="top-nav">
-            <div class="nav-tabs">
-                <button class="nav-tab active" onclick="switchTab(this, 'orders')">
-                    <i class="fas fa-clipboard-list"></i>
-                    工單列表
-                </button>
-                <button class="nav-tab" onclick="switchTab(this, 'schedule')">
-                    <i class="fas fa-calendar-alt"></i>
-                    生產排程
-                </button>
-                <button class="nav-tab" onclick="switchTab(this, 'kanban')">
-                    <i class="fas fa-columns"></i>
-                    看板
-                </button>
-                <button class="nav-tab" onclick="switchTab(this, 'resources')">
-                    <i class="fas fa-cogs"></i>
-                    資源管理
-                </button>
-                <button class="nav-tab" onclick="switchTab(this, 'reports')">
-                    <i class="fas fa-chart-bar"></i>
-                    報表分析
-                </button>
+    <!-- Main View (Project List) -->
+    <div id="mainView">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-top">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-industry"></i>
+                    </div>
+                    <div class="logo-text">生產排程管理系統</div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-header secondary">
+                        <i class="fas fa-home"></i>
+                        回主系統
+                    </button>
+                    <button class="btn-header primary" onclick="openNewProjectModal()">
+                        <i class="fas fa-plus"></i>
+                        新增專案
+                    </button>
+                </div>
             </div>
-            <div class="add-tab" onclick="addNewTab()">
-                <i class="fas fa-plus"></i>
-            </div>
-        </nav>
 
-        <!-- Toolbar -->
-        <div class="toolbar">
-            <button class="toolbar-btn" title="新增" onclick="openModal()">
-                <i class="fas fa-plus"></i>
-            </button>
-            <button class="toolbar-btn" title="編輯" onclick="editSelected()">
-                <i class="fas fa-edit"></i>
-            </button>
-            <button class="toolbar-btn" title="刪除" onclick="deleteSelected()">
-                <i class="fas fa-trash"></i>
-            </button>
-            <div class="toolbar-divider"></div>
-            <button class="toolbar-btn" title="篩選">
-                <i class="fas fa-filter"></i>
-            </button>
-            <button class="toolbar-btn" title="排序">
-                <i class="fas fa-sort"></i>
-            </button>
-            <button class="toolbar-btn" title="分組">
-                <i class="fas fa-layer-group"></i>
-            </button>
-            <div class="toolbar-divider"></div>
-            <button class="toolbar-btn" title="匯入">
-                <i class="fas fa-file-import"></i>
-            </button>
-            <button class="toolbar-btn" title="匯出">
-                <i class="fas fa-file-export"></i>
-            </button>
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" placeholder="搜尋工單..." id="searchInput" onkeyup="searchOrders()">
+            <div class="stats-bar">
+                <div class="stat-badge urgent">
+                    <i class="fas fa-circle"></i>
+                    緊急: 0
+                </div>
+                <div class="stat-badge processing">
+                    <i class="fas fa-circle"></i>
+                    報價中: 3
+                </div>
+                <div class="stat-badge quote">
+                    <i class="fas fa-circle"></i>
+                    報價待確認: 2
+                </div>
+                <div class="stat-badge sample">
+                    <i class="fas fa-circle"></i>
+                    打樣後: 9
+                </div>
+                <div class="stat-badge done">
+                    <i class="fas fa-circle"></i>
+                    已完成: 1
+                </div>
+                <div class="update-time">更新: 2026/3/30 下午2:36</div>
+            </div>
+
+            <div class="search-bar">
+                <div class="search-input">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="搜尋客戶、產品或聯絡人...">
+                </div>
+                <div class="search-input">
+                    <i class="fas fa-filter"></i>
+                    <input type="text" placeholder="進一步篩選 (可留空)">
+                </div>
+                <button class="btn-search">
+                    <i class="fas fa-search"></i>
+                    搜尋
+                </button>
+                <button class="btn-clear">
+                    <i class="fas fa-times"></i>
+                    清除
+                </button>
+                <button class="btn-header secondary">
+                    <i class="fas fa-users"></i>
+                    人員查詢
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="container">
+            <!-- Phase Tabs -->
+            <div class="phase-tabs">
+                <button class="phase-tab active">
+                    <i class="fas fa-lightbulb"></i>
+                    提案階段
+                </button>
+                <button class="phase-tab">
+                    <i class="fas fa-file-invoice"></i>
+                    報價階段
+                </button>
+                <button class="phase-tab">
+                    <i class="fas fa-vial"></i>
+                    打樣階段
+                </button>
+                <button class="phase-tab">
+                    <i class="fas fa-industry"></i>
+                    生產階段
+                </button>
+                <button class="phase-tab">
+                    <i class="fas fa-shipping-fast"></i>
+                    出貨階段
+                </button>
+                <button class="phase-tab">
+                    <i class="fas fa-list-check"></i>
+                    進行中清單
+                </button>
+                <div class="phase-divider"></div>
+                <button class="phase-tab">
+                    <i class="fas fa-check-circle"></i>
+                    已結案
+                </button>
+                <button class="phase-tab">
+                    <i class="fas fa-clock"></i>
+                    待確認專案
+                </button>
+            </div>
+
+            <!-- Section Title -->
+            <div class="section-title">
+                <i class="fas fa-lightbulb"></i>
+                提案中（需求確認/概念發想）
+            </div>
+
+            <!-- Project Cards -->
+            <div class="projects-grid" id="projectsGrid">
+                <!-- Cards will be generated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail View (Hidden by default) -->
+    <div class="detail-view" id="detailView">
+        <div class="detail-header">
+            <div class="detail-title">
+                <button class="btn-back" onclick="backToMain()">
+                    <i class="fas fa-arrow-left"></i>
+                    返回專案列表
+                </button>
+                <h2 id="detailProjectName">專案詳情</h2>
             </div>
         </div>
 
-        <!-- Main Content -->
-        <div class="main-content">
+        <div class="detail-tabs">
+            <div class="detail-tab active">工單列表</div>
+            <div class="detail-tab">生產排程</div>
+            <div class="detail-tab">看板</div>
+            <div class="detail-tab">資源管理</div>
+            <div class="detail-tab">報表分析</div>
+        </div>
+
+        <div class="detail-toolbar">
+            <button class="toolbar-btn" title="新增"><i class="fas fa-plus"></i></button>
+            <button class="toolbar-btn" title="編輯"><i class="fas fa-edit"></i></button>
+            <button class="toolbar-btn" title="刪除"><i class="fas fa-trash"></i></button>
+            <div class="toolbar-divider"></div>
+            <button class="toolbar-btn" title="篩選"><i class="fas fa-filter"></i></button>
+            <button class="toolbar-btn" title="排序"><i class="fas fa-sort"></i></button>
+            <div class="toolbar-divider"></div>
+            <button class="toolbar-btn" title="匯入"><i class="fas fa-file-import"></i></button>
+            <button class="toolbar-btn" title="匯出"><i class="fas fa-file-export"></i></button>
+        </div>
+
+        <div style="overflow-x: auto;">
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th style="width: 40px;">
-                            <div class="checkbox" onclick="toggleSelectAll()" id="selectAll"></div>
-                        </th>
+                        <th style="width: 40px;"><div class="checkbox"></div></th>
                         <th><i class="fas fa-hashtag"></i>序號</th>
                         <th><i class="fas fa-file-alt"></i>工單編號</th>
                         <th><i class="fas fa-box"></i>產品名稱</th>
@@ -709,167 +873,120 @@
                         <th>操作</th>
                     </tr>
                 </thead>
-                <tbody id="tableBody">
+                <tbody id="detailTableBody">
                     <!-- Data will be inserted by JS -->
                 </tbody>
             </table>
-
-            <div class="add-row" onclick="openModal()">
+            <div class="add-row">
                 <i class="fas fa-plus"></i>
-                <span>新增工單</span>
-            </div>
-        </div>
-
-        <!-- Bottom Bar -->
-        <div class="bottom-bar">
-            <div class="stats">
-                <div class="stat-item">
-                    <div class="stat-dot" style="background: var(--green);"></div>
-                    <span>已完成: <strong id="stat-done">0</strong></span>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-dot" style="background: var(--blue);"></div>
-                    <span>進行中: <strong id="stat-progress">0</strong></span>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-dot" style="background: var(--yellow);"></div>
-                    <span>待產: <strong id="stat-pending">0</strong></span>
-                </div>
-                <div class="stat-item">
-                    <span>總計: <strong id="stat-total">0</strong> 筆</span>
-                </div>
-            </div>
-
-            <div class="pagination">
-                <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
-                <button class="page-btn active">1</button>
-                <button class="page-btn">2</button>
-                <button class="page-btn">3</button>
-                <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal -->
-    <div class="modal-overlay" id="modal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 class="modal-title" id="modal-title">新增工單</h3>
-                <button class="modal-close" onclick="closeModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <form id="orderForm" class="modal-body">
-                <input type="hidden" id="orderId">
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">工單編號</label>
-                        <input type="text" id="orderNo" class="form-input" placeholder="WO-202403-001" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">產品名稱</label>
-                        <input type="text" id="productName" class="form-input" placeholder="產品名稱" required>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">產線</label>
-                        <select id="productionLine" class="form-select" required>
-                            <option value="">選擇產線</option>
-                            <option value="A線">A線</option>
-                            <option value="B線">B線</option>
-                            <option value="C線">C線</option>
-                            <option value="D線">D線</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">狀態</label>
-                        <select id="status" class="form-select" required>
-                            <option value="pending">待產</option>
-                            <option value="progress">進行中</option>
-                            <option value="done">已完成</option>
-                            <option value="hold">暫停</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">優先級</label>
-                        <select id="priority" class="form-select" required>
-                            <option value="high">高</option>
-                            <option value="medium">中</option>
-                            <option value="low">低</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">數量</label>
-                        <input type="number" id="quantity" class="form-input" placeholder="0" min="1" required>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">開始日期</label>
-                        <input type="date" id="startDate" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">結束日期</label>
-                        <input type="date" id="endDate" class="form-input" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">負責人</label>
-                    <input type="text" id="assignee" class="form-input" placeholder="負責人姓名">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">備註</label>
-                    <textarea id="note" class="form-textarea" placeholder="備註說明"></textarea>
-                </div>
-            </form>
-
-            <div class="modal-footer">
-                <button class="btn-action btn-secondary" onclick="closeModal()">取消</button>
-                <button class="btn-action btn-primary" onclick="saveOrder()">儲存</button>
+                新增工單
             </div>
         </div>
     </div>
 
     <script>
-        // Sample Data
-        let orders = JSON.parse(localStorage.getItem('crmOrders') || '[]');
-        let selectedRows = new Set();
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            if (orders.length === 0) {
-                orders = [
-                    { id: '1', orderNo: 'WO-202403-001', productName: '精密軸承-A型', productionLine: 'A線', status: 'done', priority: 'high', startDate: '2024-03-20', endDate: '2024-03-24', quantity: 2000, assignee: '張明遠', note: '' },
-                    { id: '2', orderNo: 'WO-202403-002', productName: '齒輪組-B型', productionLine: 'B線', status: 'progress', priority: 'high', startDate: '2024-03-25', endDate: '2024-03-28', quantity: 1500, assignee: '李思涵', note: '優先處理' },
-                    { id: '3', orderNo: 'WO-202403-003', productName: '連接器-C型', productionLine: 'A線', status: 'pending', priority: 'medium', startDate: '2024-03-26', endDate: '2024-03-29', quantity: 3000, assignee: '王建國', note: '' },
-                    { id: '4', orderNo: 'WO-202403-004', productName: '外殼組件-D型', productionLine: 'C線', status: 'hold', priority: 'low', startDate: '2024-03-27', endDate: '2024-03-30', quantity: 800, assignee: '陳雅芳', note: '材料待確認' },
-                    { id: '5', orderNo: 'WO-202403-005', productName: '電路板-E型', productionLine: 'D線', status: 'progress', priority: 'high', startDate: '2024-03-25', endDate: '2024-03-28', quantity: 1200, assignee: '林志豪', note: '' },
-                    { id: '6', orderNo: 'WO-202403-006', productName: '散熱片-F型', productionLine: 'B線', status: 'pending', priority: 'medium', startDate: '2024-03-28', endDate: '2024-04-01', quantity: 2500, assignee: '黃美玲', note: '' },
-                    { id: '7', orderNo: 'WO-202403-007', productName: '傳動軸-G型', productionLine: 'A線', status: 'done', priority: 'low', startDate: '2024-03-18', endDate: '2024-03-22', quantity: 600, assignee: '劉大偉', note: '已完成檢驗' },
-                    { id: '8', orderNo: 'WO-202403-008', productName: '密封圈-H型', productionLine: 'C線', status: 'pending', priority: 'high', startDate: '2024-03-29', endDate: '2024-04-02', quantity: 5000, assignee: '周小婷', note: '急單' }
-                ];
-                localStorage.setItem('crmOrders', JSON.stringify(orders));
+        // Sample Projects Data
+        const projects = [
+            {
+                id: 'A0010-260317',
+                name: '20寸/28寸行李箱+logo印刷',
+                client: '高柏科技',
+                contact: 'Joanne',
+                status: 'proposal',
+                statusText: '提案中',
+                progress: 0,
+                deadline: '預計這兩天下單',
+                orders: [
+                    { id: '1', orderNo: 'WO-202403-001', productName: '20寸行李箱外殼', line: 'A線', status: 'pending', priority: 'high', startDate: '2024-03-20', endDate: '2024-03-24', quantity: 2000, assignee: '張明遠' },
+                    { id: '2', orderNo: 'WO-202403-002', productName: '28寸行李箱外殼', line: 'B線', status: 'pending', priority: 'high', startDate: '2024-03-25', endDate: '2024-03-28', quantity: 1500, assignee: '李思涵' },
+                    { id: '3', orderNo: 'WO-202403-003', productName: 'Logo印刷-熱轉印', line: 'C線', status: 'pending', priority: 'medium', startDate: '2024-03-26', endDate: '2024-03-29', quantity: 3500, assignee: '王建國' }
+                ]
+            },
+            {
+                id: 'A0011-260318',
+                name: '鋁合金手機支架',
+                client: '創新科技',
+                contact: 'Alex',
+                status: 'quote',
+                statusText: '報價中',
+                progress: 25,
+                deadline: '等待客戶確認',
+                orders: [
+                    { id: '4', orderNo: 'WO-202403-004', productName: '支架底座', line: 'A線', status: 'progress', priority: 'high', startDate: '2024-03-27', endDate: '2024-03-30', quantity: 5000, assignee: '陳雅芳' }
+                ]
+            },
+            {
+                id: 'A0012-260319',
+                name: 'USB-C 充電線組',
+                client: '數位生活',
+                contact: '小美',
+                status: 'sample',
+                statusText: '打樣後',
+                progress: 60,
+                deadline: '樣品確認中',
+                orders: [
+                    { id: '5', orderNo: 'WO-202403-005', productName: 'Type-C 線材', line: 'D線', status: 'progress', priority: 'high', startDate: '2024-03-25', endDate: '2024-03-28', quantity: 10000, assignee: '林志豪' },
+                    { id: '6', orderNo: 'WO-202403-006', productName: '包裝盒印刷', line: 'B線', status: 'pending', priority: 'low', startDate: '2024-03-28', endDate: '2024-04-01', quantity: 10000, assignee: '黃美玲' }
+                ]
             }
-            renderTable();
-            updateStats();
-        });
+        ];
 
-        // Render Table
-        function renderTable(data = orders) {
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
+        // Render Project Cards
+        function renderProjects() {
+            const grid = document.getElementById('projectsGrid');
+            grid.innerHTML = projects.map(project => `
+                <div class="project-card" onclick="openProject('${project.id}')">
+                    <div class="card-header">
+                        <span class="project-id">${project.id}</span>
+                        <span class="project-status">
+                            <i class="fas fa-lightbulb"></i>
+                            ${project.statusText}
+                        </span>
+                    </div>
+                    <div class="project-name">${project.name}</div>
+                    <div class="project-client">
+                        <i class="fas fa-building"></i>
+                        ${project.client} / ${project.contact}
+                    </div>
+                    <div class="project-meta">
+                        <span class="meta-item">
+                            <i class="fas fa-clipboard-list"></i>
+                            ${project.orders.length} 個工單
+                        </span>
+                        <span class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            ${project.deadline}
+                        </span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${project.progress}%"></div>
+                    </div>
+                    <div class="progress-text">${project.progress}% 完成</div>
+                    
+                    <div class="card-actions">
+                        <button class="btn-card success" onclick="event.stopPropagation(); completeProject('${project.id}')">
+                            <i class="fas fa-check"></i>
+                            完成結案
+                        </button>
+                        <button class="btn-card warning" onclick="event.stopPropagation(); incompleteProject('${project.id}')">
+                            <i class="fas fa-chart-bar"></i>
+                            未完成結案
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
 
-            data.forEach((order, index) => {
+        // Open Project Detail
+        function openProject(projectId) {
+            const project = projects.find(p => p.id === projectId);
+            if (!project) return;
+
+            document.getElementById('detailProjectName').textContent = project.name;
+            
+            // Render detail table
+            const tbody = document.getElementById('detailTableBody');
+            tbody.innerHTML = project.orders.map((order, index) => {
                 const statusClass = {
                     done: 'status-done',
                     progress: 'status-progress',
@@ -892,198 +1009,59 @@
 
                 const priorityText = { high: '高', medium: '中', low: '低' }[order.priority] || '中';
 
-                const avatar = order.assignee ? order.assignee.charAt(0) : '?';
+                const colors = ['blue', 'green', 'purple', 'orange'];
+                const avatarColor = colors[index % colors.length];
 
-                tbody.innerHTML += `
-                    <tr onclick="selectRow('${order.id}', this)">
-                        <td>
-                            <div class="checkbox ${selectedRows.has(order.id) ? 'checked' : ''}" 
-                                 onclick="toggleCheckbox(event, '${order.id}')">
-                                ${selectedRows.has(order.id) ? '<i class="fas fa-check"></i>' : ''}
-                            </div>
-                        </td>
-                        <td class="row-num">${index + 1}</td>
-                        <td><span class="cell-link">${order.orderNo}</span></td>
-                        <td><span class="cell-text">${order.productName}</span></td>
-                        <td><span class="cell-text">${order.productionLine}</span></td>
+                return `
+                    <tr>
+                        <td><div class="checkbox"></div></td>
+                        <td>${index + 1}</td>
+                        <td>${order.orderNo}</td>
+                        <td>${order.productName}</td>
+                        <td>${order.line}</td>
                         <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                        <td><span class="priority-tag ${priorityClass}">${priorityText}</span></td>
-                        <td><span class="cell-text">${order.startDate}</span></td>
-                        <td><span class="cell-text">${order.endDate}</span></td>
-                        <td><span class="cell-text">${order.quantity.toLocaleString()}</span></td>
+                        <td><span class="priority ${priorityClass}">${priorityText}</span></td>
+                        <td>${order.startDate}</td>
+                        <td>${order.endDate}</td>
+                        <td>${order.quantity.toLocaleString()}</td>
                         <td>
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <div class="avatar">${avatar}</div>
-                                <span>${order.assignee || '-'}</span>
+                            <div class="user-cell">
+                                <div class="avatar ${avatarColor}">${order.assignee.charAt(0)}</div>
+                                <span>${order.assignee}</span>
                             </div>
                         </td>
-                        <td>
-                            <button class="btn-action btn-primary" onclick="editOrder(event, '${order.id}')">
-                                編輯
-                            </button>
-                        </td>
+                        <td><button class="btn-action">編輯</button></td>
                     </tr>
                 `;
-            });
+            }).join('');
+
+            // Switch views
+            document.getElementById('mainView').style.display = 'none';
+            document.getElementById('detailView').classList.add('active');
         }
 
-        // Selection
-        function toggleCheckbox(event, id) {
-            event.stopPropagation();
-            if (selectedRows.has(id)) {
-                selectedRows.delete(id);
-            } else {
-                selectedRows.add(id);
-            }
-            renderTable();
+        // Back to Main
+        function backToMain() {
+            document.getElementById('mainView').style.display = 'block';
+            document.getElementById('detailView').classList.remove('active');
         }
 
-        function selectRow(id, row) {
-            document.querySelectorAll('.data-table tr').forEach(r => r.classList.remove('selected'));
-            row.classList.add('selected');
+        // Project Actions
+        function completeProject(id) {
+            alert(`專案 ${id} 標記為完成結案`);
         }
 
-        function toggleSelectAll() {
-            const selectAll = document.getElementById('selectAll');
-            if (selectedRows.size === orders.length) {
-                selectedRows.clear();
-                selectAll.classList.remove('checked');
-                selectAll.innerHTML = '';
-            } else {
-                orders.forEach(o => selectedRows.add(o.id));
-                selectAll.classList.add('checked');
-                selectAll.innerHTML = '<i class="fas fa-check"></i>';
-            }
-            renderTable();
+        function incompleteProject(id) {
+            alert(`專案 ${id} 標記為未完成結案`);
         }
 
-        // Stats
-        function updateStats() {
-            document.getElementById('stat-done').textContent = orders.filter(o => o.status === 'done').length;
-            document.getElementById('stat-progress').textContent = orders.filter(o => o.status === 'progress').length;
-            document.getElementById('stat-pending').textContent = orders.filter(o => o.status === 'pending').length;
-            document.getElementById('stat-total').textContent = orders.length;
+        function openNewProjectModal() {
+            alert('新增專案功能');
         }
 
-        // Search
-        function searchOrders() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = orders.filter(o => 
-                o.orderNo.toLowerCase().includes(query) ||
-                o.productName.toLowerCase().includes(query) ||
-                o.assignee.toLowerCase().includes(query)
-            );
-            renderTable(filtered);
-        }
-
-        // Tab Switching
-        function switchTab(tab, view) {
-            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            // View switching logic would go here
-        }
-
-        function addNewTab() {
-            const name = prompt('輸入新分頁名稱:');
-            if (name) {
-                // Add new tab logic
-            }
-        }
-
-        // Modal
-        function openModal() {
-            document.getElementById('modal').classList.add('active');
-            document.getElementById('orderForm').reset();
-            document.getElementById('orderId').value = '';
-            document.getElementById('modal-title').textContent = '新增工單';
-            document.getElementById('startDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('endDate').value = new Date().toISOString().split('T')[0];
-        }
-
-        function closeModal() {
-            document.getElementById('modal').classList.remove('active');
-        }
-
-        function saveOrder() {
-            const form = document.getElementById('orderForm');
-            if (!form.checkValidity()) {
-                form.reportValidity();
-                return;
-            }
-
-            const orderData = {
-                id: document.getElementById('orderId').value || Date.now().toString(),
-                orderNo: document.getElementById('orderNo').value,
-                productName: document.getElementById('productName').value,
-                productionLine: document.getElementById('productionLine').value,
-                status: document.getElementById('status').value,
-                priority: document.getElementById('priority').value,
-                quantity: parseInt(document.getElementById('quantity').value),
-                startDate: document.getElementById('startDate').value,
-                endDate: document.getElementById('endDate').value,
-                assignee: document.getElementById('assignee').value,
-                note: document.getElementById('note').value
-            };
-
-            const existingIndex = orders.findIndex(o => o.id === orderData.id);
-            if (existingIndex >= 0) {
-                orders[existingIndex] = orderData;
-            } else {
-                orders.push(orderData);
-            }
-
-            localStorage.setItem('crmOrders', JSON.stringify(orders));
-            closeModal();
-            renderTable();
-            updateStats();
-        }
-
-        function editOrder(event, id) {
-            event.stopPropagation();
-            const order = orders.find(o => o.id === id);
-            if (!order) return;
-
-            document.getElementById('modal').classList.add('active');
-            document.getElementById('orderId').value = order.id;
-            document.getElementById('orderNo').value = order.orderNo;
-            document.getElementById('productName').value = order.productName;
-            document.getElementById('productionLine').value = order.productionLine;
-            document.getElementById('status').value = order.status;
-            document.getElementById('priority').value = order.priority;
-            document.getElementById('quantity').value = order.quantity;
-            document.getElementById('startDate').value = order.startDate;
-            document.getElementById('endDate').value = order.endDate;
-            document.getElementById('assignee').value = order.assignee;
-            document.getElementById('note').value = order.note || '';
-            document.getElementById('modal-title').textContent = '編輯工單';
-        }
-
-        function editSelected() {
-            if (selectedRows.size !== 1) {
-                alert('請選擇一個工單進行編輯');
-                return;
-            }
-            const id = Array.from(selectedRows)[0];
-            editOrder({ stopPropagation: () => {} }, id);
-        }
-
-        function deleteSelected() {
-            if (selectedRows.size === 0) {
-                alert('請選擇要刪除的工單');
-                return;
-            }
-            if (!confirm(`確定要刪除 ${selectedRows.size} 筆工單嗎？`)) return;
-
-            orders = orders.filter(o => !selectedRows.has(o.id));
-            selectedRows.clear();
-            localStorage.setItem('crmOrders', JSON.stringify(orders));
-            renderTable();
-            updateStats();
-        }
-
-        // Close modal on overlay click
-        document.getElementById('modal').addEventListener('click', function(e) {
-            if (e.target === this) closeModal();
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            renderProjects();
         });
     </script>
 </body>
