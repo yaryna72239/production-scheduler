@@ -322,14 +322,49 @@
             gap: 8px;
             color: var(--text-secondary);
             font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .project-info {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 12px 16px;
             margin-bottom: 16px;
         }
 
-        .project-meta {
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
             display: flex;
             align-items: center;
-            gap: 16px;
-            margin-bottom: 16px;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .info-label i {
+            width: 16px;
+            color: var(--primary);
+        }
+
+        .info-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .project-meta {
+            display: none;
         }
 
         .meta-item {
@@ -811,7 +846,9 @@
                 status: 'proposal',
                 statusText: '提案中',
                 progress: 0,
-                deadline: '預計這兩天下單',
+                startDate: '2024-03-15',
+                totalQuantity: 7000,
+                deliveryDate: '2024-04-15',
                 orders: [
                     { id: '1', orderNo: 'WO-202403-001', productName: '20寸行李箱外殼', line: 'A線', status: 'pending', priority: 'high', startDate: '2024-03-20', endDate: '2024-03-24', quantity: 2000, assignee: '張明遠' },
                     { id: '2', orderNo: 'WO-202403-002', productName: '28寸行李箱外殼', line: 'B線', status: 'pending', priority: 'high', startDate: '2024-03-25', endDate: '2024-03-28', quantity: 1500, assignee: '李思涵' },
@@ -826,7 +863,9 @@
                 status: 'quote',
                 statusText: '報價中',
                 progress: 25,
-                deadline: '等待客戶確認',
+                startDate: '2024-03-18',
+                totalQuantity: 5000,
+                deliveryDate: '2024-04-10',
                 orders: [
                     { id: '4', orderNo: 'WO-202403-004', productName: '支架底座', line: 'A線', status: 'progress', priority: 'high', startDate: '2024-03-27', endDate: '2024-03-30', quantity: 5000, assignee: '陳雅芳' }
                 ]
@@ -839,7 +878,9 @@
                 status: 'sample',
                 statusText: '打樣後',
                 progress: 60,
-                deadline: '樣品確認中',
+                startDate: '2024-03-20',
+                totalQuantity: 20000,
+                deliveryDate: '2024-04-20',
                 orders: [
                     { id: '5', orderNo: 'WO-202403-005', productName: 'Type-C 線材', line: 'D線', status: 'progress', priority: 'high', startDate: '2024-03-25', endDate: '2024-03-28', quantity: 10000, assignee: '林志豪' },
                     { id: '6', orderNo: 'WO-202403-006', productName: '包裝盒印刷', line: 'B線', status: 'pending', priority: 'low', startDate: '2024-03-28', endDate: '2024-04-01', quantity: 10000, assignee: '黃美玲' }
@@ -847,10 +888,19 @@
             }
         ];
 
+        // Helper function to get day of week
+        function getDayOfWeek(dateStr) {
+            const days = ['日', '一', '二', '三', '四', '五', '六'];
+            const date = new Date(dateStr);
+            return '星期' + days[date.getDay()];
+        }
+
         // Render Project Cards
         function renderProjects() {
             const grid = document.getElementById('projectsGrid');
-            grid.innerHTML = projects.map(project => `
+            grid.innerHTML = projects.map(project => {
+                const deliveryDay = getDayOfWeek(project.deliveryDate);
+                return `
                 <div class="project-card" onclick="openProject('${project.id}')">
                     <div class="card-header">
                         <span class="project-id">${project.id}</span>
@@ -860,14 +910,26 @@
                         <i class="fas fa-building"></i>
                         ${project.client} / ${project.contact}
                     </div>
+                    <div class="project-info">
+                        <div class="info-row">
+                            <span class="info-label"><i class="fas fa-calendar"></i> 開始日期</span>
+                            <span class="info-value">${project.startDate}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label"><i class="fas fa-sort-numeric-up"></i> 數量</span>
+                            <span class="info-value">${project.totalQuantity.toLocaleString()}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label"><i class="fas fa-calendar-check"></i> 交期</span>
+                            <span class="info-value">${project.deliveryDate} (${deliveryDay})</span>
+                        </div>
+                    </div>
                     <div class="progress-bar">
                         <div class="progress-fill" style="width: ${project.progress}%"></div>
                     </div>
                     <div class="progress-text">${project.progress}% 完成</div>
-                    
-
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         // Open Project Detail
