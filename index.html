@@ -963,16 +963,7 @@
                     </div>
                     <div class="progress-text">${project.progress}% 完成</div>
                     
-                    <div class="card-actions">
-                        <button class="btn-card success" onclick="event.stopPropagation(); completeProject('${project.id}')">
-                            <i class="fas fa-check"></i>
-                            完成結案
-                        </button>
-                        <button class="btn-card warning" onclick="event.stopPropagation(); incompleteProject('${project.id}')">
-                            <i class="fas fa-chart-bar"></i>
-                            未完成結案
-                        </button>
-                    </div>
+
                 </div>
             `).join('');
         }
