@@ -690,7 +690,175 @@
             background: var(--primary-dark);
         }
 
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            position: relative;
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-header h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .modal-header h3 i {
+            color: var(--primary);
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #f1f5f9;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: #e2e8f0;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .form-group label .required {
+            color: var(--danger);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .form-group input[readonly] {
+            background: #f8fafc;
+            color: var(--text-secondary);
+        }
+
+        .btn-cancel {
+            padding: 10px 20px;
+            border: 1px solid var(--border);
+            background: white;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-cancel:hover {
+            background: #f8fafc;
+        }
+
+        .btn-save {
+            padding: 10px 24px;
+            border: none;
+            background: var(--primary);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-save:hover {
+            background: var(--primary-dark);
+        }
+
         /* Add Row */
+        .add-row {
         .add-row {
             display: flex;
             align-items: center;
@@ -954,34 +1122,155 @@
             `}).join('');
         }
 
-        // Edit Project
+        // Edit Project - Open Modal
         function editProject(projectId) {
             const project = projects.find(p => p.id === projectId);
             if (!project) return;
-
-            const newName = prompt('編輯案名：', project.name);
-            if (newName !== null && newName.trim() !== '') {
-                project.name = newName.trim();
+            
+            // Create modal if not exists
+            let modal = document.getElementById('editModal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'editModal';
+                modal.className = 'modal';
+                modal.innerHTML = `
+                    <div class="modal-overlay" onclick="closeEditModal()"></div>
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3><i class="fas fa-edit"></i> 編輯專案</h3>
+                            <button class="modal-close" onclick="closeEditModal()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="editForm">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>專案編號 <span class="required">*</span></label>
+                                        <input type="text" id="editProjectId" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>新增日期 <span class="required">*</span></label>
+                                        <input type="date" id="editCreateDate">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>負責人 <span class="required">*</span></label>
+                                        <input type="text" id="editContact" placeholder="輸入負責人姓名...">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>公司名稱 <span class="required">*</span></label>
+                                        <input type="text" id="editClient" placeholder="輸入公司名稱...">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>產品名稱</label>
+                                        <input type="text" id="editProductName" placeholder="選填">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>數量</label>
+                                        <input type="number" id="editQuantity" placeholder="選填，例如：1000">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>開始日期</label>
+                                        <input type="date" id="editStartDate">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>交期</label>
+                                        <input type="date" id="editDeliveryDate">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>目前階段 <span class="required">*</span></label>
+                                        <select id="editStatus">
+                                            <option value="proposal">💡 提案</option>
+                                            <option value="quote">📋 報價</option>
+                                            <option value="sample">🔧 打樣</option>
+                                            <option value="production">🏭 生產</option>
+                                            <option value="shipping">🚚 出貨</option>
+                                            <option value="done">✅ 已完成</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>進度 (%)</label>
+                                        <input type="number" id="editProgress" min="0" max="100" placeholder="0-100">
+                                    </div>
+                                </div>
+                                <div class="form-group full-width">
+                                    <label>備註</label>
+                                    <textarea id="editNotes" rows="3" placeholder="其他備註說明..."></textarea>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn-cancel" onclick="closeEditModal()">取消</button>
+                            <button class="btn-save" onclick="saveProjectEdit()">儲存</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
             }
+            
+            // Populate form
+            document.getElementById('editProjectId').value = project.id;
+            document.getElementById('editCreateDate').value = project.startDate || '';
+            document.getElementById('editContact').value = project.contact || '';
+            document.getElementById('editClient').value = project.client || '';
+            document.getElementById('editProductName').value = project.name || '';
+            document.getElementById('editQuantity').value = project.totalQuantity || '';
+            document.getElementById('editStartDate').value = project.startDate || '';
+            document.getElementById('editDeliveryDate').value = project.deliveryDate || '';
+            document.getElementById('editStatus').value = project.status || 'proposal';
+            document.getElementById('editProgress').value = project.progress || 0;
+            document.getElementById('editNotes').value = project.notes || '';
+            
+            // Show modal
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
 
-            const newStartDate = prompt('編輯開始日期（格式：YYYY-MM-DD）：', project.startDate);
-            if (newStartDate !== null && /^\d{4}-\d{2}-\d{2}$/.test(newStartDate)) {
-                project.startDate = newStartDate;
+        // Close Edit Modal
+        function closeEditModal() {
+            const modal = document.getElementById('editModal');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
             }
+        }
 
-            const newAssignee = prompt('編輯負責人：', project.contact);
-            if (newAssignee !== null && newAssignee.trim() !== '') {
-                project.contact = newAssignee.trim();
-            }
-
-            const newQuantity = prompt('編輯數量：', project.totalQuantity);
-            if (newQuantity !== null && !isNaN(newQuantity) && newQuantity > 0) {
-                project.totalQuantity = parseInt(newQuantity);
-            }
-
-            const newDeliveryDate = prompt('編輯交期（格式：YYYY-MM-DD）：', project.deliveryDate);
-            if (newDeliveryDate !== null && /^\d{4}-\d{2}-\d{2}$/.test(newDeliveryDate)) {
-                project.deliveryDate = newDeliveryDate;
+        // Save Project Edit
+        function saveProjectEdit() {
+            const projectId = document.getElementById('editProjectId').value;
+            const project = projects.find(p => p.id === projectId);
+            if (!project) return;
+            
+            project.contact = document.getElementById('editContact').value;
+            project.client = document.getElementById('editClient').value;
+            project.name = document.getElementById('editProductName').value;
+            project.totalQuantity = parseInt(document.getElementById('editQuantity').value) || 0;
+            project.startDate = document.getElementById('editStartDate').value;
+            project.deliveryDate = document.getElementById('editDeliveryDate').value;
+            project.status = document.getElementById('editStatus').value;
+            project.progress = parseInt(document.getElementById('editProgress').value) || 0;
+            project.notes = document.getElementById('editNotes').value;
+            
+            // Update status text
+            const statusMap = {
+                proposal: '提案中',
+                quote: '報價中',
+                sample: '打樣後',
+                production: '生產中',
+                shipping: '出貨中',
+                done: '已完成'
+            };
+            project.statusText = statusMap[project.status] || '提案中';
+            
+            closeEditModal();
+            renderProjects();
+        } = newDeliveryDate;
             }
 
             renderProjects();
